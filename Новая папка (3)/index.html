@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NurKo'z 2.0 — Bog'cha Videokuzatuv Tizimi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ==============================
+   RESET & VARIABLES
+================================ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#07090f;--bg2:#0d1120;--bg3:#121828;--bg4:#182035;--bg5:#1d2840;
+  --brd:#1a2a45;--brd2:#22365a;--brd3:#2a4470;
+  --g:#00e87a;--g2:#00c466;--g3:rgba(0,232,122,.08);
+  --c:#22d3ee;--c2:rgba(34,211,238,.08);
+  --b:#3b82f6;--b2:#2563eb;--b3:rgba(37,99,235,.12);
+  --a:#f59e0b;--a2:rgba(245,158,11,.1);
+  --r:#ef4444;--r2:rgba(239,68,68,.1);
+  --p:#8b5cf6;--p2:rgba(139,92,246,.1);
+  --t:#dde4f0;--t2:#7a91b8;--t3:#3d5278;--t4:#1e2d4a;
+  --w:#ffffff;
+  --font:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --sh:0 8px 32px rgba(0,0,0,.5);
+  --rad:10px;--rad2:16px;--rad3:20px;
+}
+html{scroll-behavior:smooth;font-size:14px}
+body{font-family:var(--font);background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden;line-height:1.5}
+
+/* ==============================
+   SCROLLBAR
+================================ */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--brd3);border-radius:2px}
+
+/* ==============================
+   TOPBAR
+================================ */
+#tb{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(7,9,15,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:500}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#1d4fd8,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 0 20px rgba(6,182,212,.3)}
+.logo-text{font-size:15px;font-weight:800;color:var(--w);letter-spacing:-.3px}
+.logo-ver{font-size:9px;background:var(--b3);border:1px solid rgba(59,130,246,.2);color:#93c5fd;padding:1px 6px;border-radius:4px;font-weight:600;letter-spacing:.5px}
+.tb-center{display:flex;align-items:center;gap:6px}
+.tb-pill{font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--brd2);background:var(--bg3);color:var(--t2);display:flex;align-items:center;gap:5px}
+.tb-pill .live-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-clock{font-family:var(--mono);font-size:11px;color:var(--t2);padding:4px 10px;background:var(--bg3);border:1px solid var(--brd);border-radius:6px}
+.user-pill{display:none;align-items:center;gap:8px;padding:4px 12px 4px 6px;border-radius:8px;border:1px solid var(--brd2);background:var(--bg4);cursor:pointer;font-size:12px;color:var(--t2)}
+.user-pill.on{display:flex}
+.uavt{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;background:linear-gradient(135deg,var(--b2),var(--c))}
+.btn-exit{display:none;padding:5px 13px;border-radius:7px;border:1px solid var(--brd2);background:transparent;color:var(--t2);font-family:var(--font);font-size:11px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-exit:hover{border-color:var(--r);color:#f87171}
+.btn-exit.on{display:block}
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
+.hamburger span{width:20px;height:2px;background:var(--t2);border-radius:1px;transition:all .3s}
+@media(max-width:700px){.hamburger{display:flex}.tb-center{display:none}}
+
+/* ==============================
+   SCREENS
+================================ */
+main{padding-top:54px;min-height:100vh}
+.screen{display:none;animation:fade .3s ease}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ==============================
+   TOAST
+================================ */
+#toastBox{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:11px 16px;border-radius:10px;border-left:3px solid;font-size:12px;font-weight:500;max-width:300px;backdrop-filter:blur(12px);animation:toastIn .3s ease;pointer-events:auto}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.toast.ok{background:rgba(0,20,10,.9);border-color:var(--g);color:#6ee7b7}
+.toast.err{background:rgba(20,0,0,.9);border-color:var(--r);color:#fca5a5}
+.toast.info{background:rgba(0,10,25,.9);border-color:var(--c);color:#67e8f9}
+.toast.warn{background:rgba(20,15,0,.9);border-color:var(--a);color:#fcd34d}
+
+/* ==============================
+   MODAL BASE
+================================ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:800;display:none;align-items:center;justify-content:center;padding:1rem}
+.overlay.on{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad3);padding:1.75rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .25s ease;box-shadow:var(--sh)}
+@keyframes modalIn{from{opacity:0;scale:.96}to{opacity:1;scale:1}}
+.modal-title{font-size:1rem;font-weight:700;color:var(--w);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--brd)}
+.modal-close{position:absolute;top:1rem;right:1rem;width:30px;height:30px;border-radius:6px;border:1px solid var(--brd2);background:var(--bg4);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--brd3);color:var(--t)}
+.modal-footer{display:flex;gap:.75rem;margin-top:1.25rem;padding-top:.75rem;border-top:1px solid var(--brd)}
+.field{margin-bottom:.85rem}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;letter-spacing:.6px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg4);border:1px solid var(--brd2);border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;color:var(--t);outline:none;transition:border .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--b);box-shadow:0 0 0 3px var(--b3)}
+.field input::placeholder,.field textarea::placeholder{color:var(--t3)}
+.field select option{background:var(--bg2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+
+/* ==============================
+   BUTTONS
+================================ */
+.btn{padding:10px 18px;border-radius:9px;border:none;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
+.btn-prim{background:var(--b2);color:#fff}
+.btn-prim:hover{background:#1d4ed8;transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.35)}
+.btn-ghost{background:var(--bg4);color:var(--t2);border:1px solid var(--brd2)}
+.btn-ghost:hover{border-color:var(--brd3);color:var(--t)}
+.btn-danger{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.35)}
+.btn-green{background:rgba(0,232,122,.1);color:var(--g);border:1px solid rgba(0,232,122,.2)}
+.btn-green:hover{background:rgba(0,232,122,.18)}
+.btn-sm{padding:5px 10px;border-radius:6px;font-size:11px}
+.btn-full{width:100%}
+.btn-icon{padding:6px;width:32px;height:32px;border-radius:7px;background:var(--bg4);border:1px solid var(--brd2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s}
+.btn-icon:hover{border-color:var(--brd3);color:var(--t)}
+
+/* ==============================
+   BADGES
+================================ */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.b-g{background:var(--g3);color:#4ade80;border:1px solid rgba(0,232,122,.15)}
+.b-r{background:var(--r2);color:#f87171;border:1px solid rgba(239,68,68,.15)}
+.b-a{background:var(--a2);color:#fbbf24;border:1px solid rgba(245,158,11,.15)}
+.b-b{background:var(--b3);color:#93c5fd;border:1px solid rgba(59,130,246,.15)}
+.b-c{background:var(--c2);color:#67e8f9;border:1px solid rgba(34,211,238,.15)}
+.b-p{background:var(--p2);color:#c4b5fd;border:1px solid rgba(139,92,246,.15)}
+.b-gray{background:rgba(71,85,105,.12);color:#94a3b8;border:1px solid rgba(71,85,105,.2)}
+
+/* ==============================
+   TABLE
+================================ */
+.tbl-wrap{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);overflow:hidden}
+.tbl-hd{padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;border-bottom:1px solid var(--brd)}
+.tbl-hd h3{font-size:12px;font-weight:600;color:var(--t2)}
+table{width:100%;border-collapse:collapse}
+th{padding:8px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--t3);background:var(--bg4);border-bottom:1px solid var(--brd);letter-spacing:.6px;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid rgba(26,42,69,.5);color:var(--t2);vertical-align:middle;font-size:12px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.012)}
+td.prim{color:var(--t);font-weight:500}
+td.mono{font-family:var(--mono);font-size:11px}
+.tsearch{background:var(--bg4);border:1px solid var(--brd2);border-radius:7px;padding:6px 11px;font-family:var(--font);font-size:11px;color:var(--t);outline:none;width:200px;transition:border .2s}
+.tsearch:focus{border-color:var(--b)}
+.tsearch::-webkit-input-placeholder{color:var(--t3)}
+
+/* ==============================
+   LANDING
+================================ */
+#s-land{min-height:calc(100vh - 54px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;text-align:center;position:relative;overflow:hidden}
+.land-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(37,99,235,.1),transparent),radial-gradient(ellipse 60% 40% at 80% 60%,rgba(6,182,212,.06),transparent);pointer-events:none}
+.land-grid{position:absolute;inset:0;background-image:linear-gradient(var(--brd) 1px,transparent 1px),linear-gradient(90deg,var(--brd) 1px,transparent 1px);background-size:50px 50px;opacity:.2;pointer-events:none}
+.land-inner{position:relative;z-index:1;max-width:680px}
+.land-tag{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;border:1px solid rgba(34,211,238,.18);background:rgba(34,211,238,.04);font-size:11px;color:var(--c);font-weight:600;margin-bottom:1.5rem;letter-spacing:.3px}
+.land-h1{font-size:clamp(1.9rem,5vw,3.2rem);font-weight:800;line-height:1.1;letter-spacing:-.6px;margin-bottom:1rem;color:var(--w)}
+.land-h1 em{font-style:normal;background:linear-gradient(135deg,#60a5fa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.land-p{font-size:.95rem;color:var(--t2);max-width:460px;margin:0 auto 2.5rem;line-height:1.75}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:560px;width:100%;margin:0 auto}
+.role-card{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad2);padding:1.75rem;cursor:pointer;transition:all .25s;text-align:left;position:relative;overflow:hidden}
+.role-card::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s}
+.role-card.p::after{background:radial-gradient(circle at 20% 50%,rgba(37,99,235,.08),transparent)}
+.role-card.d::after{background:radial-gradient(circle at 20% 50%,rgba(245,158,11,.06),transparent)}
+.role-card:hover{transform:translateY(-3px);border-color:var(--brd3)}
+.role-card:hover::after{opacity:1}
+.role-card.p:hover{border-color:var(--b)}
+.role-card.d:hover{border-color:var(--a)}
+.role-ico{width:46px;height:46px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:.9rem}
+.p .role-ico{background:rgba(37,99,235,.15)}
+.d .role-ico{background:rgba(245,158,11,.1)}
+.role-card h3{font-size:14px;font-weight:700;color:var(--w);margin-bottom:.35rem}
+.role-card p{font-size:11px;color:var(--t2);line-height:1.6}
+.role-arr{position:absolute;top:1.4rem;right:1.4rem;color:var(--t3);font-size:16px;transition:all .25s}
+.role-card:hover .role-arr{color:var(--t2);transform:translateX(3px)}
+.land-stats{display:flex;gap:2rem;margin-top:3rem;justify-content:center;flex-wrap:wrap}
+.lstat{text-align:center}
+.lstat-n{font-size:1.7rem;font-weight:800;color:var(--w)}
+.lstat-l{font-size:10px;color:var(--t3);margin-top:2px;letter-spacing:.5px}
+.land-bottom{margin-top:2.5rem;font-size:10px;color:var(--t3);display:flex;align-items:center;gap:6px;justify-content:center}
+
+/* ==============================
+   DIRECTOR LOGIN
+================================ */
+#s-dlogin{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:1.5rem 1rem;background:radial-gradient(ellipse at 50% 0%,rgba(37,99,235,.06),transparent 60%)}
+.dlogin-card{width:100%;max-width:380px;background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad3);padding:2rem;box-shadow:var(--sh)}
+.dlogin-icon{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.05));border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1.25rem}
+.dlogin-title{text-align:center;margin-bottom:1.5rem}
+.dlogin-title h2{font-size:1.1rem;font-weight:700;color:var(--w)}
+.dlogin-title p{font-size:12px;color:var(--t2);margin-top:.25rem}
+.dlogin-hint{background:var(--b3);border:1px solid rgba(59,130,246,.15);border-radius:8px;padding:8px 12px;font-size:11px;color:#93c5fd;margin-top:1rem;line-height:1.6}
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:38px}
+.pass-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:14px;color:var(--t3);border:none;background:none;padding:2px}
+
+/* ==============================
+   PARENT FLOW
+================================ */
+#s-parent{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:1.5rem 1rem}
+.pflow{width:100%;max-width:440px}
+.steps-bar{display:flex;gap:0;margin-bottom:1.5rem;background:var(--bg3);border:1px solid var(--brd);border-radius:9px;padding:3px}
+.spill{flex:1;padding:7px 4px;text-align:center;border-radius:7px;font-size:10px;font-weight:700;color:var(--t3);transition:all .3s;letter-spacing:.3px}
+.spill.on{background:var(--b2);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.4)}
+.spill.done{color:var(--g)}
+.pcard{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad2);padding:1.75rem}
+.pcard-hd{margin-bottom:1.25rem}
+.pcard-hd h2{font-size:1rem;font-weight:700;color:var(--w)}
+.pcard-hd p{font-size:11px;color:var(--t2);margin-top:.25rem;line-height:1.6}
+.err-box{border-radius:8px;padding:9px 12px;font-size:11px;margin-bottom:.9rem;display:none;line-height:1.6}
+.err-box.err{background:var(--r2);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+.err-box.ok{background:var(--g3);border:1px solid rgba(0,232,122,.2);color:#6ee7b7}
+.hint{background:var(--c2);border:1px solid rgba(34,211,238,.12);border-radius:8px;padding:9px 12px;font-size:11px;color:var(--c);margin-top:.9rem;line-height:1.7}
+.hint strong{color:#67e8f9}
+
+/* FACE ID */
+.fid-wrap{position:relative;width:200px;height:200px;border-radius:50%;margin:1rem auto;overflow:hidden;cursor:pointer;background:var(--bg4);border:2px solid var(--brd2);transition:border-color .3s}
+.fid-wrap.scan{border-color:var(--c);box-shadow:0 0 30px rgba(34,211,238,.15)}
+.fid-wrap.done{border-color:var(--g);box-shadow:0 0 30px rgba(0,232,122,.15)}
+.fid-wrap video{width:100%;height:100%;object-fit:cover;display:none;border-radius:50%}
+.fid-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:none}
+.fid-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--t3);font-size:11px;text-align:center;padding:.5rem}
+.fid-ph .fid-svg{font-size:48px;opacity:.3}
+.fid-ring{position:absolute;inset:-3px;border-radius:50%;border:3px solid transparent;border-top-color:var(--c);border-right-color:rgba(34,211,238,.3);animation:spin 1s linear infinite;pointer-events:none;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fid-corners{position:absolute;inset:0;pointer-events:none}
+.fid-corners::before,.fid-corners::after{content:'';position:absolute;width:28px;height:28px;border-color:var(--c);border-style:solid;transition:opacity .3s}
+.fid-corners::before{top:12px;left:12px;border-width:2px 0 0 2px;border-radius:5px 0 0}
+.fid-corners::after{bottom:12px;right:12px;border-width:0 2px 2px 0;border-radius:0 0 5px}
+.scanline{position:absolute;height:2px;left:0;right:0;top:0;background:linear-gradient(90deg,transparent,var(--c),transparent);animation:sl 2s ease-in-out infinite;display:none}
+@keyframes sl{0%{top:0%;opacity:.8}50%{opacity:1}100%{top:100%;opacity:0}}
+.scan .fid-ring,.scan .scanline{display:block}
+.scan .fid-corners::before,.scan .fid-corners::after{opacity:1}
+.fid-corners::before,.fid-corners::after{opacity:0}
+.prog-track{height:3px;background:var(--bg4);border-radius:2px;margin:.75rem 0;overflow:hidden;display:none}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--b2),var(--c));width:0;transition:width .08s}
+.fid-msg{text-align:center;font-size:11px;color:var(--t2);min-height:16px}
+.match-box{display:none;text-align:center;padding:.5rem 0}
+.match-num{font-size:2.2rem;font-weight:800;color:var(--g);font-family:var(--mono);line-height:1}
+.match-lbl{font-size:11px;color:var(--t2);margin-top:4px}
+
+/* ==============================
+   CAMERA VIEW (PARENT)
+================================ */
+#s-cams{padding:1.25rem}
+.cam-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem}
+.cam-hdr-l h2{font-size:1rem;font-weight:700;color:var(--w)}
+.cam-hdr-l p{font-size:11px;color:var(--t2)}
+.cam-hdr-r{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.live-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.05);font-size:10px;font-weight:700;color:#f87171;letter-spacing:.5px}
+.live-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--r);animation:blink 1.2s infinite}
+.info-bar{background:rgba(34,211,238,.04);border:1px solid rgba(34,211,238,.1);border-radius:9px;padding:8px 13px;font-size:11px;color:var(--c);margin-bottom:1.1rem;display:flex;align-items:center;gap:8px}
+.cam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1rem}
+.cam-tile{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad2);overflow:hidden;cursor:pointer;transition:all .22s}
+.cam-tile:hover,.cam-tile.sel{border-color:var(--b);box-shadow:0 0 0 1px var(--b),0 8px 24px rgba(37,99,235,.15)}
+.cam-scr{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden}
+.cam-scr canvas{width:100%;height:100%;display:block}
+.cam-top{position:absolute;top:0;left:0;right:0;padding:8px 10px;display:flex;justify-content:space-between;align-items:flex-start;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent)}
+.cam-bot{position:absolute;bottom:0;left:0;right:0;padding:6px 10px;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);display:flex;justify-content:space-between;align-items:flex-end}
+.lpill{background:rgba(220,38,38,.88);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:800;letter-spacing:.6px;color:#fff;display:flex;align-items:center;gap:4px}
+.lpill::before{content:'';width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+.cam-stamp{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.55)}
+.cam-id{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.35)}
+.cam-ft{padding:10px 13px;display:flex;align-items:center;justify-content:space-between}
+.cam-ft-l .cam-name{font-size:13px;font-weight:600;color:var(--w)}
+.cam-ft-l .cam-sub{font-size:10px;color:var(--t2);margin-top:1px}
+.cam-ft-r{display:flex;align-items:center;gap:5px}
+.sonline{width:8px;height:8px;border-radius:50%;background:var(--g)}
+
+/* FULLSCREEN */
+#full-ov{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:900;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem}
+#full-ov.on{display:flex}
+#full-cnv{max-width:100%;max-height:75vh;border-radius:12px;border:1px solid var(--brd2)}
+.full-bar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:960px;margin-top:1rem}
+.full-info{font-size:12px;color:var(--t2)}
+.full-ctrls{display:flex;gap:.5rem}
+
+/* CAM CONTROLS */
+.cam-ctrl-bar{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+
+/* ==============================
+   DIRECTOR LAYOUT
+================================ */
+#s-dir{display:grid;grid-template-columns:196px 1fr;min-height:calc(100vh - 54px)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--brd);display:flex;flex-direction:column;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.sb-section{padding:.9rem 10px;border-bottom:1px solid rgba(26,42,69,.5)}
+.sb-label{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:1.2px;padding:0 8px;margin-bottom:.4rem}
+.si{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:12px;color:var(--t2);cursor:pointer;transition:all .18s;font-weight:500;margin-bottom:1px;position:relative}
+.si svg{width:15px;height:15px;flex-shrink:0;opacity:.6}
+.si:hover{background:var(--bg4);color:var(--t)}
+.si.on{background:var(--b3);color:#93c5fd}
+.si.on svg{opacity:1}
+.si .scount{margin-left:auto;background:var(--r);color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700}
+.sb-profile{margin-top:auto;padding:.9rem 10px;border-top:1px solid var(--brd)}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:var(--bg3);border:1px solid var(--brd);cursor:pointer;transition:all .2s}
+.sb-user:hover{border-color:var(--brd2)}
+.sb-uname{font-size:11px;font-weight:600;color:var(--t)}
+.sb-urole{font-size:9px;color:var(--t3)}
+
+.dir-main{background:var(--bg);padding:1.25rem;overflow-y:auto;min-height:calc(100vh - 54px)}
+.dpage{display:none}
+.dpage.on{display:block;animation:fade .25s ease}
+.dpage-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.1rem}
+.dpage-title{font-size:1rem;font-weight:700;color:var(--w);display:flex;align-items:center;gap.5rem}
+
+/* ==============================
+   METRICS
+================================ */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.1rem}
+.mc{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:.9rem 1rem;transition:border .2s;cursor:default}
+.mc:hover{border-color:var(--brd3)}
+.mc-lbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px;margin-bottom:.4rem}
+.mc-val{font-size:1.55rem;font-weight:800;color:var(--w);line-height:1;font-family:var(--mono)}
+.mc-sub{font-size:10px;color:var(--t2);margin-top:.3rem;display:flex;align-items:center;gap:3px}
+.up{color:var(--g)}.dn{color:var(--r)}
+
+/* LIVE LOG */
+.live-log{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);margin-bottom:1.1rem;overflow:hidden}
+.ll-hd{padding:.75rem 1rem;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
+.ll-hd h3{font-size:11px;font-weight:600;color:var(--t2);display:flex;align-items:center;gap:6px}
+.ll-entries{max-height:240px;overflow-y:auto}
+.le{display:grid;grid-template-columns:8px 1fr auto;gap:8px;align-items:start;padding:9px 12px;border-bottom:1px solid rgba(26,42,69,.4);transition:background .18s;font-size:11px}
+.le:hover{background:rgba(255,255,255,.015)}
+.le:last-child{border:none}
+.le-dot{width:7px;height:7px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.le-txt{color:var(--t2);line-height:1.5}
+.le-txt strong{color:var(--t);font-weight:500}
+.le-time{font-family:var(--mono);font-size:10px;color:var(--t3);white-space:nowrap}
+
+/* CHART */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.1rem}
+.chart-card{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:1rem;overflow:hidden}
+.chart-card h4{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:.75rem}
+.chart-card canvas{width:100%;display:block}
+
+/* ALL CAMS */
+.acam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem}
+.acam{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);overflow:hidden;transition:border .2s}
+.acam:hover{border-color:var(--brd3)}
+.acam-scr{position:relative;aspect-ratio:4/3;background:#000;overflow:hidden}
+.acam-scr canvas{width:100%;height:100%;display:block}
+.acam-ol{position:absolute;top:0;left:0;right:0;padding:6px 8px;background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent);display:flex;justify-content:space-between;align-items:center}
+.acam-ol2{position:absolute;bottom:0;left:0;right:0;padding:5px 8px;background:linear-gradient(to top,rgba(0,0,0,.65),transparent);display:flex;justify-content:flex-end}
+.acam-ft{padding:7px 10px;display:flex;align-items:center;justify-content:space-between}
+.acam-nm{font-size:11px;font-weight:600;color:var(--t)}
+.acam-grp{font-size:10px;color:var(--t2);margin-top:1px}
+.sw{width:30px;height:16px;border-radius:8px;background:var(--g2);cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
+.sw::after{content:'';position:absolute;width:10px;height:10px;border-radius:50%;background:#fff;top:3px;right:3px;transition:right .25s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw.off{background:var(--brd2)}
+.sw.off::after{right:17px}
+
+/* USERS */
+.user-grid{display:flex;flex-direction:column}
+.urow{display:grid;grid-template-columns:36px 1fr 1fr 110px 80px 80px;gap:8px;align-items:center;padding:9px 12px;border-bottom:1px solid rgba(26,42,69,.4);transition:background .18s}
+.urow:hover{background:rgba(255,255,255,.012)}
+.urow:last-child{border:none}
+.urow-hd{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px;background:var(--bg4);border-bottom:1px solid var(--brd) !important;padding:8px 12px}
+.ua{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+
+/* ATTENDANCE */
+.att-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.1rem}
+.att-c{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:.9rem 1rem}
+.att-c-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.att-c-lbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px}
+.att-c-n{font-size:1.6rem;font-weight:800;color:var(--w);font-family:var(--mono)}
+.att-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:.5rem;overflow:hidden}
+.att-bar-fill{height:100%;border-radius:2px}
+.qr-box{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:1.25rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap}
+.qr-icon{width:80px;height:80px;background:var(--bg4);border:1px solid var(--brd2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0}
+.qr-info h4{font-size:13px;font-weight:600;color:var(--w);margin-bottom:.3rem}
+.qr-info p{font-size:11px;color:var(--t2);line-height:1.6;max-width:360px}
+.att-row{display:grid;grid-template-columns:1fr 120px 70px 70px 80px;gap:8px;align-items:center;padding:9px 12px;border-bottom:1px solid rgba(26,42,69,.4);font-size:11px}
+.att-row:hover{background:rgba(255,255,255,.012)}
+.att-row:last-child{border:none}
+.att-row-hd{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px;background:var(--bg4);border-bottom:1px solid var(--brd)}
+.att-time{font-family:var(--mono);font-size:10px;text-align:center}
+
+/* NOTIFICATIONS */
+.notif-compose{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:1.1rem;margin-bottom:1rem}
+.notif-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+.notif-item{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;transition:border .2s}
+.notif-item.fresh{border-color:rgba(34,211,238,.2);background:rgba(34,211,238,.02)}
+.ni-lbl{font-size:12px;font-weight:600;color:var(--t);margin-bottom:3px}
+.ni-body{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:.4rem}
+.ni-time{font-family:var(--mono);font-size:10px;color:var(--t3);white-space:nowrap;text-align:right;margin-top:3px}
+
+/* REPORTS */
+.rep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.1rem}
+.rep-card{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:1rem;cursor:pointer;transition:all .2s;text-align:center}
+.rep-card:hover{border-color:var(--brd3);transform:translateY(-2px)}
+.rep-ico{font-size:28px;margin-bottom:.5rem}
+.rep-title{font-size:12px;font-weight:600;color:var(--t);margin-bottom:.25rem}
+.rep-sub{font-size:10px;color:var(--t2)}
+
+/* SCHEDULE */
+.sch-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+.sch-card{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);padding:1rem}
+.sch-card h3{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:.9rem;letter-spacing:.3px}
+.sch-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(26,42,69,.4);font-size:11px}
+.sch-row:last-child{border:none}
+.sch-val{font-family:var(--mono);font-size:10px;color:var(--c)}
+.sch-off{font-size:10px;color:var(--r);font-weight:600}
+
+/* SETTINGS */
+.sett-section{background:var(--bg3);border:1px solid var(--brd2);border-radius:var(--rad);margin-bottom:.75rem;overflow:hidden}
+.sett-shead{padding:.9rem 1rem;border-bottom:1px solid var(--brd);font-size:12px;font-weight:600;color:var(--t2);display:flex;align-items:center;gap:.5rem}
+.sett-row{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-bottom:1px solid rgba(26,42,69,.4);font-size:12px}
+.sett-row:last-child{border:none}
+.sett-row-l{flex:1;margin-right:1rem}
+.sett-row-l span{display:block;color:var(--t);font-weight:500}
+.sett-row-l small{color:var(--t3);font-size:10px;margin-top:1px;display:block}
+
+/* SYSTEM LOG */
+.sys-log{background:var(--bg);border:1px solid var(--brd);border-radius:var(--rad);padding:.75rem;font-family:var(--mono);font-size:10px;color:var(--t3);max-height:200px;overflow-y:auto;line-height:1.8}
+.sl-line span{margin-right:8px}
+.sl-line .sl-t{color:var(--t3)}
+.sl-line .sl-ok{color:var(--g)}
+.sl-line .sl-warn{color:var(--a)}
+.sl-line .sl-err{color:var(--r)}
+.sl-line .sl-info{color:var(--c)}
+
+/* RESPONSIVE */
+@media(max-width:960px){.metrics,.att-stats{grid-template-columns:1fr 1fr}.chart-row{grid-template-columns:1fr}}
+@media(max-width:760px){
+  #s-dir{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto;top:0;flex-direction:row;overflow-x:auto;padding:.5rem;border-right:none;border-bottom:1px solid var(--brd)}
+  .sb-section{display:flex;flex-direction:row;gap:2px;margin:0;border:none;padding:0 4px;flex-shrink:0}
+  .sb-label,.sb-profile{display:none}
+  .si{white-space:nowrap;font-size:11px;padding:6px 10px;margin:0}
+  .si span:not(.scount){display:none}
+  .urow{grid-template-columns:32px 1fr 80px 60px}
+  .urow .hide-m{display:none}
+  .att-row{grid-template-columns:1fr 80px 60px}
+  .att-row .hide-m{display:none}
+  .rep-grid{grid-template-columns:1fr 1fr}
+  .sch-grid{grid-template-columns:1fr}
+  .notif-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .role-grid{grid-template-columns:1fr}
+  .land-stats{gap:1.25rem}
+  .cam-grid{grid-template-columns:1fr}
+  .metrics,.att-stats{grid-template-columns:1fr 1fr}
+  .acam-grid{grid-template-columns:1fr 1fr}
+  .rep-grid{grid-template-columns:1fr}
+  .field-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOPBAR ===== -->
+<div id="tb">
+  <div class="logo" onclick="goHome()">
+    <div class="logo-icon">👁</div>
+    <div>
+      <div class="logo-text">NurKo'z <span class="logo-ver">v2.0</span></div>
+    </div>
+  </div>
+  <div class="tb-center">
+    <div class="tb-pill"><div class="live-dot"></div> Tizim faol</div>
+    <div class="tb-pill" id="tbCams" style="display:none">📹 <span id="tbCamCount">0</span> kamera online</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-clock" id="tbClock"></div>
+    <div class="user-pill" id="upill"><div class="uavt" id="uavt">?</div><span id="uname"></span></div>
+    <button class="btn-exit on" id="btnExit" style="display:none" onclick="goHome()">Chiqish ✕</button>
+  </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toastBox"></div>
+
+<!-- ===== FULLSCREEN CAMERA ===== -->
+<div id="full-ov">
+  <canvas id="full-cnv" width="960" height="540"></canvas>
+  <div class="full-bar">
+    <div class="full-info" id="fullInfo"></div>
+    <div class="full-ctrls">
+      <button class="btn btn-ghost btn-sm" onclick="snapFull()">📸 Snapshot</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeFull()">✕ Yopish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: ADD USER ===== -->
+<div class="overlay" id="ov-adduser">
+  <div class="modal">
+    <div class="modal-title">👤 Yangi foydalanuvchi qo'shish</div>
+    <button class="modal-close" onclick="closeModal('ov-adduser')">✕</button>
+    <div class="field-row">
+      <div class="field"><label>OTA-ONA ISMI</label><input id="nu-pname" placeholder="Ism Familiya"></div>
+      <div class="field"><label>TELEFON</label><input id="nu-phone" placeholder="+998 90 000 00 00"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>BOLANING ISMI</label><input id="nu-cname" placeholder="Bola ismi"></div>
+      <div class="field"><label>BOLANING FAMILIYASI</label><input id="nu-csurname" placeholder="Familiya"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>GURUH</label>
+        <select id="nu-group">
+          <option value="">— Tanlang —</option>
+          <option>Kichik guruh</option>
+          <option>O'rta guruh</option>
+          <option>Katta guruh</option>
+          <option>Tayyorlov guruhi</option>
+        </select>
+      </div>
+      <div class="field"><label>TUG'ILGAN YILI</label><input id="nu-year" placeholder="2020" type="number" min="2018" max="2023"></div>
+    </div>
+    <div class="field"><label>MANZIL (IXTIYORIY)</label><input id="nu-addr" placeholder="Ko'cha, uy raqami"></div>
+    <div class="field"><label>ESLATMA</label><input id="nu-note" placeholder="Ixtiyoriy..."></div>
+    <div class="modal-footer">
+      <button class="btn btn-prim btn-full" onclick="saveUser()">✓ Saqlash</button>
+      <button class="btn btn-ghost" onclick="closeModal('ov-adduser')">Bekor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: CONFIRM DELETE ===== -->
+<div class="overlay" id="ov-del">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div style="font-size:40px;margin-bottom:1rem">⚠️</div>
+    <div class="modal-title" style="text-align:center;border:none;padding:0;margin-bottom:.5rem">O'chirishni tasdiqlang</div>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:1.5rem;line-height:1.7">Foydalanuvchini o'chirsangiz, uning barcha ma'lumotlari va kirish huquqlari to'liq o'chiriladi.</p>
+    <div class="modal-footer" style="justify-content:center;border:none;padding:0;margin:0">
+      <button class="btn btn-danger" onclick="confirmDel()">⚠ Ha, o'chirish</button>
+      <button class="btn btn-ghost" onclick="closeModal('ov-del')">Bekor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: ADD CAMERA ===== -->
+<div class="overlay" id="ov-addcam">
+  <div class="modal">
+    <div class="modal-title">📡 Yangi kamera qo'shish</div>
+    <button class="modal-close" onclick="closeModal('ov-addcam')">✕</button>
+    <div class="field-row">
+      <div class="field"><label>KAMERA ID</label><input id="nc-id" placeholder="Masalan: K4"></div>
+      <div class="field"><label>IP MANZIL</label><input id="nc-ip" placeholder="192.168.1.XXX"></div>
+    </div>
+    <div class="field"><label>NOMI</label><input id="nc-name" placeholder="Masalan: Kutubxona"></div>
+    <div class="field-row">
+      <div class="field"><label>GURUH</label>
+        <select id="nc-group">
+          <option>Kichik guruh</option><option>O'rta guruh</option><option>Katta guruh</option><option>Tayyorlov guruhi</option>
+        </select>
+      </div>
+      <div class="field"><label>PROTOKOL</label>
+        <select id="nc-proto"><option>RTSP</option><option>HLS</option><option>WebRTC</option></select>
+      </div>
+    </div>
+    <div class="field"><label>PORT</label><input id="nc-port" placeholder="554" value="554"></div>
+    <div class="modal-footer">
+      <button class="btn btn-prim btn-full" onclick="saveCam()">📡 Qo'shish</button>
+      <button class="btn btn-ghost" onclick="closeModal('ov-addcam')">Bekor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: SNAPSHOT ===== -->
+<div class="overlay" id="ov-snap">
+  <div class="modal" style="max-width:520px;text-align:center">
+    <div class="modal-title">📸 Snapshot saqlandi</div>
+    <button class="modal-close" onclick="closeModal('ov-snap')">✕</button>
+    <canvas id="snap-cnv" style="width:100%;border-radius:8px;border:1px solid var(--brd2);max-height:300px;object-fit:contain"></canvas>
+    <p style="font-size:11px;color:var(--t2);margin-top:.75rem" id="snap-info"></p>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn btn-prim" onclick="downloadSnap()">⬇ Yuklab olish</button>
+      <button class="btn btn-ghost" onclick="closeModal('ov-snap')">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<main>
+<!-- ========================
+     LANDING
+======================== -->
+<div id="s-land" class="screen on">
+  <div class="land-bg"></div>
+  <div class="land-grid"></div>
+  <div class="land-inner">
+    <div class="land-tag">🔒 SSL · Biometrik Face ID · Real-vaqt stream</div>
+    <h1 class="land-h1">Farzandingiz xavfsizligi —<br><em>doim ko'z oldingizda</em></h1>
+    <p class="land-p">NurKo'z — zamonaviy bog'cha nazorat tizimi. Uch bosqichli biometrik himoya, jonli video efir va to'liq shaffof boshqaruv.</p>
+    <div class="role-grid">
+      <div class="role-card p" onclick="gotoParent()">
+        <div class="role-ico">👩‍👦</div>
+        <h3>Ota-ona kabineti</h3>
+        <p>Farzandingiz guruhini jonli kuzating. Faqat ruxsat etilgan kameralar ko'rsatiladi.</p>
+        <div class="role-arr">→</div>
+      </div>
+      <div class="role-card d" onclick="gotoDirLogin()">
+        <div class="role-ico">🏫</div>
+        <h3>Direktor paneli</h3>
+        <p>Barcha kameralar, foydalanuvchilar, davomat va hisobotlar — bir joyda.</p>
+        <div class="role-arr">→</div>
+      </div>
+    </div>
+    <div class="land-stats">
+      <div class="lstat"><div class="lstat-n" id="ls1">0</div><div class="lstat-l">KAMERA</div></div>
+      <div class="lstat"><div class="lstat-n" id="ls2">0</div><div class="lstat-l">GURUH</div></div>
+      <div class="lstat"><div class="lstat-n" id="ls3">0</div><div class="lstat-l">BOLA</div></div>
+      <div class="lstat"><div class="lstat-n" id="ls4">0</div><div class="lstat-l">OTA-ONA</div></div>
+    </div>
+    <div class="land-bottom">🔐 256-bit SSL · HTTPS · GDPR mos · Mahalliy server</div>
+  </div>
+</div>
+
+<!-- ========================
+     DIRECTOR LOGIN
+======================== -->
+<div id="s-dlogin" class="screen">
+  <div class="dlogin-card">
+    <div class="dlogin-icon">🏫</div>
+    <div class="dlogin-title">
+      <h2>Direktor paneli</h2>
+      <p>Kirish uchun parolingizni kiriting</p>
+    </div>
+    <div class="err-box err" id="dl-err"></div>
+    <div class="field"><label>FOYDALANUVCHI NOMI</label><input id="dl-user" value="admin" placeholder="admin"></div>
+    <div class="field"><label>PAROL</label>
+      <div class="pass-wrap">
+        <input id="dl-pass" type="password" placeholder="••••••••">
+        <button class="pass-eye" onclick="togglePass()">👁</button>
+      </div>
+    </div>
+    <button class="btn btn-prim btn-full" onclick="dirLogin()">Kirish →</button>
+    <button class="btn btn-ghost btn-full" style="margin-top:.5rem" onclick="goHome()">← Orqaga</button>
+    <div class="dlogin-hint">💡 Demo: Login <strong>admin</strong> · Parol <strong>1234</strong></div>
+  </div>
+</div>
+
+<!-- ========================
+     PARENT FLOW
+======================== -->
+<div id="s-parent" class="screen">
+  <div class="pflow">
+    <div class="steps-bar">
+      <div class="spill on" id="sp1">1 · Ma'lumotlar</div>
+      <div class="spill" id="sp2">2 · Face ID</div>
+      <div class="spill" id="sp3">3 · Kameralar</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="ps1">
+      <div class="pcard">
+        <div class="pcard-hd"><h2>Tizimga kirish</h2><p>Farzandingizning bog'cha ma'lumotlarini kiriting</p></div>
+        <div class="err-box err" id="p-err"></div>
+        <div class="field"><label>BOLANING ISMI</label><input id="f-nm" placeholder="Masalan: Davron" autocomplete="off"></div>
+        <div class="field"><label>BOLANING FAMILIYASI</label><input id="f-sn" placeholder="Masalan: Karimov" autocomplete="off"></div>
+        <div class="field"><label>GURUH</label>
+          <select id="f-gr">
+            <option value="">— Guruhni tanlang —</option>
+            <option value="kichik">Kichik guruh (3–4 yosh)</option>
+            <option value="orta">O'rta guruh (4–5 yosh)</option>
+            <option value="katta">Katta guruh (5–6 yosh)</option>
+            <option value="tayyorlov">Tayyorlov guruhi (6–7 yosh)</option>
+          </select>
+        </div>
+        <button class="btn btn-prim btn-full" style="margin-top:.25rem" onclick="checkParent()">Davom etish →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:.5rem" onclick="goHome()">← Bosh sahifa</button>
+        <div class="hint">💡 Demo: Ism <strong>Davron</strong> · Familiya <strong>Karimov</strong> · <strong>Katta guruh</strong></div>
+      </div>
+    </div>
+
+    <!-- STEP 2 FACE ID -->
+    <div id="ps2" style="display:none">
+      <div class="pcard">
+        <div class="pcard-hd"><h2>Biometrik tasdiqlash</h2><p>Yuzingizni kameraga to'g'rilang. Tizim 95%+ mos kelish talab qiladi.</p></div>
+        <div class="fid-wrap" id="fidBox" onclick="startFid()">
+          <div class="fid-ph" id="fidPh"><div class="fid-svg">👤</div><span>Skanerlash uchun bosing</span></div>
+          <video id="fidVid" autoplay muted playsinline></video>
+          <canvas id="fidCnv"></canvas>
+          <div class="fid-ring" id="fidRing"></div>
+          <div class="fid-corners"></div>
+          <div class="scanline" id="scanline"></div>
+        </div>
+        <div class="prog-track" id="fidProg"><div class="prog-fill" id="fidBar"></div></div>
+        <div class="fid-msg" id="fidMsg">Bosing va skanerlashni boshlang</div>
+        <div class="match-box" id="matchBox">
+          <div class="match-num" id="matchNum">0%</div>
+          <div class="match-lbl">Biometrik mos kelish darajasi</div>
+        </div>
+        <div class="err-box ok" id="fid-ok" style="margin-top:.75rem"></div>
+        <button class="btn btn-ghost btn-full" style="margin-top:.75rem" onclick="showPS(1)">← Orqaga</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     CAMERA VIEW (PARENT)
+======================== -->
+<div id="s-cams" class="screen">
+  <div class="cam-hdr">
+    <div class="cam-hdr-l">
+      <h2 id="camTitle">Kameralar</h2>
+      <p id="camSub">Yuklanmoqda...</p>
+    </div>
+    <div class="cam-hdr-r">
+      <div class="live-chip">JONLI EFIR</div>
+      <div class="tb-pill" id="camTimeChip">08:00–18:00</div>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">Chiqish</button>
+    </div>
+  </div>
+  <div class="info-bar">🔒 Faqat <strong id="accGrp" style="margin:0 4px;color:var(--w)">—</strong> guruhiga ruxsat berilgan · Boshqa guruhlar bloklangan · <span style="margin-left:auto;font-family:var(--mono);font-size:10px" id="sessionTimer">00:00</span></div>
+  <div class="cam-grid" id="camGrid"></div>
+  <div class="cam-ctrl-bar">
+    <button class="btn btn-ghost btn-sm" onclick="snapAllCams()">📸 Barcha kameralardan snapshot</button>
+    <button class="btn btn-ghost btn-sm" onclick="toast('Kirish vaqti qayd etildi (10:15:32)','info')">📋 Kirish vaqtini qayd etish</button>
+  </div>
+</div>
+
+<!-- ========================
+     DIRECTOR PANEL
+======================== -->
+<div id="s-dir" class="screen">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">ASOSIY</div>
+      <div class="si on" onclick="showPage('ov',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Umumiy ko'rinish</span>
+      </div>
+      <div class="si" onclick="showPage('allcams',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <span>Barcha kameralar</span>
+      </div>
+      <div class="si" onclick="showPage('logs',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Audit jurnali</span><span class="scount">8</span>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">BOSHQARUV</div>
+      <div class="si" onclick="showPage('users',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <span>Foydalanuvchilar</span>
+      </div>
+      <div class="si" onclick="showPage('att',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14l2 2 4-4"/></svg>
+        <span>Davomat</span>
+      </div>
+      <div class="si" onclick="showPage('notif',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span>E'lonlar</span>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">HISOBOTLAR</div>
+      <div class="si" onclick="showPage('reports',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Hisobotlar</span>
+      </div>
+      <div class="si" onclick="showPage('sched',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Jadval</span>
+      </div>
+      <div class="si" onclick="showPage('settings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Sozlamalar</span>
+      </div>
+    </div>
+    <div class="sb-profile">
+      <div class="sb-user" onclick="toast('Profil sahifasi tez orada','info')">
+        <div class="ua" style="width:32px;height:32px;background:linear-gradient(135deg,var(--b2),var(--c));color:#fff;font-size:12px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">D</div>
+        <div><div class="sb-uname">Direktor</div><div class="sb-urole">Admin · Superuser</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="dir-main">
+
+    <!-- OVERVIEW -->
+    <div id="dp-ov" class="dpage on">
+      <div class="dpage-hd">
+        <div class="dpage-title">📊 Umumiy ko'rinish</div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--mono)" id="ovDate"></div>
+      </div>
+      <div class="metrics">
+        <div class="mc"><div class="mc-lbl">ONLINE KAMERALAR</div><div class="mc-val">11<span style="font-size:1rem;color:var(--t2)">/12</span></div><div class="mc-sub"><span class="up">↑</span> 91.7% faol</div></div>
+        <div class="mc"><div class="mc-lbl">HOZIR KUZATMOQDA</div><div class="mc-val" id="wNow">5</div><div class="mc-sub">ota-ona online</div></div>
+        <div class="mc"><div class="mc-lbl">BUGUNGI KIRISHLAR</div><div class="mc-val">43</div><div class="mc-sub"><span class="up">↑</span> kechagidan +3</div></div>
+        <div class="mc"><div class="mc-lbl">DAVOMAT</div><div class="mc-val">41<span style="font-size:1rem;color:var(--t2)">/48</span></div><div class="mc-sub"><span class="up">↑</span> 85.4%</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-card"><h4>📈 Haftalik kirish statistikasi</h4><canvas id="chartWeek" height="120"></canvas></div>
+        <div class="chart-card"><h4>🗂 Guruhlar bo'yicha davomat</h4><canvas id="chartAtt" height="120"></canvas></div>
+      </div>
+      <div class="live-log">
+        <div class="ll-hd">
+          <h3><span style="width:7px;height:7px;border-radius:50%;background:var(--g);display:inline-block;margin-right:3px"></span> Real vaqt — Kim kuzatmoqda</h3>
+          <span style="font-size:10px;color:var(--t3);font-family:var(--mono)" id="lvTime"></span>
+        </div>
+        <div class="ll-entries" id="llEntries"></div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-hd"><h3>📅 Bugungi muhim hodisalar</h3></div>
+        <table><thead><tr><th>VAQT</th><th>HODISA</th><th>GURUH</th><th>HOLAT</th></tr></thead>
+        <tbody id="evTbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ALL CAMERAS -->
+    <div id="dp-allcams" class="dpage">
+      <div class="dpage-hd">
+        <div class="dpage-title">📹 Barcha kameralar (12)</div>
+        <button class="btn btn-prim btn-sm" onclick="openModal('ov-addcam')">+ Kamera qo'shish</button>
+      </div>
+      <div class="acam-grid" id="acamGrid"></div>
+    </div>
+
+    <!-- AUDIT LOG -->
+    <div id="dp-logs" class="dpage">
+      <div class="dpage-hd">
+        <div class="dpage-title">📋 Audit jurnali</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <select class="tsearch" style="width:auto" onchange="filterLogs(this.value)" id="lgFilt">
+            <option value="">Barcha guruhlar</option>
+            <option value="Kichik">Kichik guruh</option>
+            <option value="O'rta">O'rta guruh</option>
+            <option value="Katta">Katta guruh</option>
+            <option value="Tayyorlov">Tayyorlov guruhi</option>
+          </select>
+          <input class="tsearch" placeholder="🔍 Qidirish..." oninput="searchLogs(this.value)" id="lgSearch">
+          <button class="btn btn-ghost btn-sm" onclick="exportLogs()">⬇ CSV</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>OTA-ONA</th><th>BOLA</th><th class="hide-m">GURUH</th><th class="hide-m">KAMERA</th><th>VAQT</th><th>DAVOM.</th><th>HOLAT</th></tr></thead>
+        <tbody id="lgBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="dp-users" class="dpage">
+      <div class="dpage-hd">
+        <div class="dpage-title">👥 Foydalanuvchilar (<span id="uCount">0</span>)</div>
+        <div style="display:flex;gap:.5rem">
+          <input class="tsearch" placeholder="🔍 Qidirish..." oninput="searchUsers(this.value)">
+          <button class="btn btn-prim btn-sm" onclick="openModal('ov-adduser')">+ Qo'shish</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="user-grid">
+          <div class="urow urow-hd"><span></span><span>OTA-ONA / BOLA</span><span class="hide-m">GURUH</span><span class="hide-m">TELEFON</span><span>HOLAT</span><span>AMAL</span></div>
+          <div id="uList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div id="dp-att" class="dpage">
+      <div class="dpage-hd">
+        <div class="dpage-title">📅 Davomat — <span id="attDate" style="color:var(--t2);font-size:.85rem;font-weight:400"></span></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <select class="tsearch" style="width:auto" onchange="filterAtt(this.value)">
+            <option value="">Barcha guruhlar</option>
+            <option>Kichik guruh</option><option>O'rta guruh</option><option>Katta guruh</option><option>Tayyorlov guruhi</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="exportAtt()">⬇ Excel</button>
+        </div>
+      </div>
+      <div class="att-stats">
+        <div class="att-c"><div class="att-c-top"><span class="att-c-lbl">JAMI BOLALAR</span><span class="badge b-b">Bugun</span></div><div class="att-c-n">48</div><div class="att-bar"><div class="att-bar-fill" style="width:100%;background:var(--b)"></div></div></div>
+        <div class="att-c"><div class="att-c-top"><span class="att-c-lbl">KELDI</span><span class="badge b-g">✓</span></div><div class="att-c-n" style="color:var(--g)">41</div><div class="att-bar"><div class="att-bar-fill" style="width:85%;background:var(--g)"></div></div></div>
+        <div class="att-c"><div class="att-c-top"><span class="att-c-lbl">KELMADI</span><span class="badge b-r">✗</span></div><div class="att-c-n" style="color:var(--r)">7</div><div class="att-bar"><div class="att-bar-fill" style="width:15%;background:var(--r)"></div></div></div>
+        <div class="att-c"><div class="att-c-top"><span class="att-c-lbl">KETDI</span><span class="badge b-a">↩</span></div><div class="att-c-n" style="color:var(--a)">12</div><div class="att-bar"><div class="att-bar-fill" style="width:25%;background:var(--a)"></div></div></div>
+      </div>
+      <div class="qr-box">
+        <div class="qr-icon" id="qrIcon">📷</div>
+        <div class="qr-info">
+          <h4>QR Davomat tizimi</h4>
+          <p>Ota-onalar bolasini olib kelganda yoki ketkazganda smartfonida QR kodni ko'rsatadi. Tizim avtomatik vaqtni qayd etadi va SMS yuboradi.</p>
+          <div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="simQR('Karimov Davron','08:07')">▶ QR Scan simulyatsiyasi</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportAtt()">⬇ Hisobotni yuklab olish</button>
+          </div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-hd"><h3>Bugungi davomat jadvali</h3></div>
+        <div>
+          <div class="att-row att-row-hd"><span>BOLA</span><span class="hide-m">GURUH</span><span>KELDI</span><span>KETDI</span><span>HOLAT</span></div>
+          <div id="attBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="dp-notif" class="dpage">
+      <div class="dpage-hd"><div class="dpage-title">🔔 Bildirishnomalar & E'lonlar</div></div>
+      <div class="notif-compose">
+        <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:.9rem;letter-spacing:.3px">YANGI E'LON YUBORISH</div>
+        <div class="notif-grid">
+          <div class="field"><label>KIMGA</label>
+            <select id="nTo"><option>Barcha ota-onalarga</option><option>Kichik guruh ota-onalariga</option><option>O'rta guruh ota-onalariga</option><option>Katta guruh ota-onalariga</option><option>Tayyorlov guruhi ota-onalariga</option></select>
+          </div>
+          <div class="field"><label>E'LON TURI</label>
+            <select id="nType"><option>📢 Umumiy e'lon</option><option>⚠️ Muhim xabar</option><option>📅 Tadbir haqida</option><option>💊 Sog'liq & gigiyena</option><option>💰 To'lov eslatmasi</option></select>
+          </div>
+        </div>
+        <div class="field"><label>SARLAVHA</label><input id="nTitle" placeholder="E'lon sarlavhasi..."></div>
+        <div class="field"><label>MATN</label><textarea id="nBody" rows="3" placeholder="E'lon matni..."></textarea></div>
+        <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-prim" onclick="sendNotif()">📤 Yuborish</button>
+          <button class="btn btn-ghost btn-sm" onclick="sendSMS()">📱 SMS ham yuborish</button>
+          <span style="font-size:10px;color:var(--t3)" id="nCount">0 ta ota-ona</span>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:.6rem">Oxirgi yuborilgan e'lonlar</div>
+      <div id="notifList" style="display:flex;flex-direction:column;gap:.6rem"></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="dp-reports" class="dpage">
+      <div class="dpage-hd"><div class="dpage-title">📊 Hisobotlar</div></div>
+      <div class="rep-grid">
+        <div class="rep-card" onclick="genReport('davomat')"><div class="rep-ico">📅</div><div class="rep-title">Oylik davomat</div><div class="rep-sub">May 2026 — PDF/Excel</div></div>
+        <div class="rep-card" onclick="genReport('kirish')"><div class="rep-ico">🔐</div><div class="rep-title">Kirish jurnali</div><div class="rep-sub">Barcha autentifikatsiyalar</div></div>
+        <div class="rep-card" onclick="genReport('kamera')"><div class="rep-ico">📹</div><div class="rep-title">Kamera holati</div><div class="rep-sub">Uptime va xatolar</div></div>
+        <div class="rep-card" onclick="genReport('ota-ona')"><div class="rep-ico">👨‍👩‍👧</div><div class="rep-title">Ota-onalar faolligi</div><div class="rep-sub">Kim qancha vaqt ko'rgan</div></div>
+        <div class="rep-card" onclick="genReport('guruh')"><div class="rep-ico">🏫</div><div class="rep-title">Guruhlar bo'yicha</div><div class="rep-sub">Qiyosiy tahlil</div></div>
+        <div class="rep-card" onclick="genReport('xavfsizlik')"><div class="rep-ico">🔒</div><div class="rep-title">Xavfsizlik hisoboti</div><div class="rep-sub">Bloklash, ogohlantirishlar</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-hd"><h3>📁 Avval yaratilgan hisobotlar</h3></div>
+        <table><thead><tr><th>NOMI</th><th>DAVR</th><th>YARATILDI</th><th>HAJM</th><th>AMAL</th></tr></thead>
+        <tbody>
+          <tr><td class="prim">Aprel 2026 — Davomat hisoboti</td><td class="mono">01.04–30.04.2026</td><td class="mono">01.05.2026</td><td>124 KB</td><td><button class="btn btn-ghost btn-sm" onclick="toast('Hisobot yuklab olinmoqda...','info')">⬇ Yuklab olish</button></td></tr>
+          <tr><td class="prim">Mart 2026 — Kirish jurnali</td><td class="mono">01.03–31.03.2026</td><td class="mono">01.04.2026</td><td>89 KB</td><td><button class="btn btn-ghost btn-sm" onclick="toast('Hisobot yuklab olinmoqda...','info')">⬇ Yuklab olish</button></td></tr>
+          <tr><td class="prim">Q1 2026 — Xavfsizlik hisoboti</td><td class="mono">01.01–31.03.2026</td><td class="mono">02.04.2026</td><td>215 KB</td><td><button class="btn btn-ghost btn-sm" onclick="toast('Hisobot yuklab olinmoqda...','info')">⬇ Yuklab olish</button></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="dp-sched" class="dpage">
+      <div class="dpage-hd"><div class="dpage-title">⏰ Jadval & Kamera sozlamalari</div><button class="btn btn-prim btn-sm" onclick="toast('Jadval saqlandi','ok')">💾 Saqlash</button></div>
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>📅 Ota-onalar kirish jadvali</h3>
+          <div class="sch-row"><span>Dushanba – Juma</span><span class="sch-val">08:00 – 18:00</span></div>
+          <div class="sch-row"><span>Shanba</span><span class="sch-off">YOPIQ</span></div>
+          <div class="sch-row"><span>Yakshanba</span><span class="sch-off">YOPIQ</span></div>
+          <div class="sch-row"><span>Bayram kunlari</span><span style="font-family:var(--mono);font-size:10px;color:var(--a)">AVTOMATIK</span></div>
+          <div class="sch-row"><span>Kechasi (18:00–08:00)</span><span class="sch-off">FAQAT XAVFSIZLIK</span></div>
+        </div>
+        <div class="sch-card">
+          <h3>🎛 Guruhlar yoqish/o'chirish</h3>
+          <div class="sch-row"><span>Kichik guruh (3 kamera)</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>O'rta guruh (3 kamera)</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Katta guruh (3 kamera)</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Tayyorlov guruhi (3 kamera)</span><div class="sw" onclick="toggleSw(this)"></div></div>
+        </div>
+        <div class="sch-card">
+          <h3>📱 Xabarnoma kanallari</h3>
+          <div class="sch-row"><span>SMS xabarnomalar</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Push notifications</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Email hisobotlar</span><div class="sw off" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Telegram bot</span><div class="sw off" onclick="toggleSw(this)"></div></div>
+        </div>
+        <div class="sch-card">
+          <h3>🎥 Video sozlamalari</h3>
+          <div class="sch-row"><span>Stream sifati</span><span class="sch-val">1080p / 30fps</span></div>
+          <div class="sch-row"><span>Yozib olish (DVR)</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Harakatni aniqlash</span><div class="sw" onclick="toggleSw(this)"></div></div>
+          <div class="sch-row"><span>Bufer vaqti</span><span class="sch-val">2–3 soniya</span></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-hd"><h3>📡 IP Kameralar konfiguratsiyasi</h3><button class="btn btn-prim btn-sm" onclick="openModal('ov-addcam')">+ Qo'shish</button></div>
+        <table><thead><tr><th>ID</th><th>NOMI</th><th>IP MANZIL</th><th>GURUH</th><th>PROTOKOL</th><th>HOLAT</th><th>AMAL</th></tr></thead>
+        <tbody id="ipTbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="dp-settings" class="dpage">
+      <div class="dpage-hd"><div class="dpage-title">⚙️ Tizim sozlamalari</div></div>
+      <div class="sett-section">
+        <div class="sett-shead">🔐 Xavfsizlik sozlamalari</div>
+        <div class="sett-row"><div class="sett-row-l"><span>Ikki bosqichli tasdiqlash (2FA)</span><small>SMS orqali tasdiqlash kodi</small></div><div class="sw" onclick="toggleSw(this);toast('2FA sozlamalari yangilandi','ok')"></div></div>
+        <div class="sett-row"><div class="sett-row-l"><span>Sessiya muddati</span><small>Faol bo'lmasa avtomatik chiqish</small></div><select class="tsearch" style="width:auto"><option>30 daqiqa</option><option>1 soat</option><option>2 soat</option></select></div>
+        <div class="sett-row"><div class="sett-row-l"><span>IP filtrlash</span><small>Faqat whitelist IP lardan kirish</small></div><div class="sw off" onclick="toggleSw(this)"></div></div>
+        <div class="sett-row"><div class="sett-row-l"><span>Brute-force himoyasi</span><small>5 marta xato — 30 daqiqa bloklash</small></div><div class="sw" onclick="toggleSw(this)"></div></div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-shead">📹 Kamera sozlamalari</div>
+        <div class="sett-row"><div class="sett-row-l"><span>Stream protokoli</span><small>HLS (kechikish: 2–6 sek) yoki WebRTC (kechikish: &lt;1 sek)</small></div><select class="tsearch" style="width:auto"><option>HLS</option><option>WebRTC</option><option>RTMP</option></select></div>
+        <div class="sett-row"><div class="sett-row-l"><span>Video sifati</span><small>Yuqori sifat = ko'proq tarmoq iste'moli</small></div><select class="tsearch" style="width:auto"><option>1080p 30fps</option><option>720p 30fps</option><option>480p 25fps</option></select></div>
+        <div class="sett-row"><div class="sett-row-l"><span>Yozib olish (DVR)</span><small>Serverda 30 kunlik arxiv</small></div><div class="sw" onclick="toggleSw(this)"></div></div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-shead">👤 Face ID sozlamalari</div>
+        <div class="sett-row"><div class="sett-row-l"><span>Minimal mos kelish foizi</span><small>Hozirgi sozlama: 95%</small></div><select class="tsearch" style="width:auto"><option>90%</option><option>95%</option><option>97%</option><option>99%</option></select></div>
+        <div class="sett-row"><div class="sett-row-l"><span>Yuz rasmi soni</span><small>Bir ota-ona uchun ko'proq rasmlar = aniqroq</small></div><select class="tsearch" style="width:auto"><option>1 ta rasm</option><option>3 ta rasm</option><option>5 ta rasm</option></select></div>
+        <div class="sett-row"><div class="sett-row-l"><span>Muvaffaqiyatsiz urinishlar</span><small>Nechta marta rad etilsin</small></div><select class="tsearch" style="width:auto"><option>3 marta</option><option>5 marta</option><option>10 marta</option></select></div>
+      </div>
+      <div class="sett-section">
+        <div class="sett-shead">🖥 Tizim holati</div>
+        <div class="sys-log" id="sysLog"></div>
+      </div>
+      <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn btn-prim" onclick="toast('Sozlamalar saqlandi','ok')">💾 Saqlash</button>
+        <button class="btn btn-ghost" onclick="toast('Zaxira nusxa yaratildi','ok')">📦 Zaxira nusxa</button>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Hamma sozlamalarni qayta tiklash?'))toast('Sozlamalar qayta tiklandi','warn')">↺ Default</button>
+      </div>
+    </div>
+
+  </div><!-- /dir-main -->
+</div><!-- /s-dir -->
+</main>
+
+<script>
+// =====================================================
+//   DATA MODEL
+// =====================================================
+const DB = {
+  children:[
+    {name:'Davron',sn:'Karimov',grp:'katta',gl:'Katta guruh',parent:'Karimov Sanjar',phone:'+998901234567'},
+    {name:'Nodira',sn:'Yusupova',grp:'orta',gl:"O'rta guruh",parent:'Yusupova Dilnoza',phone:'+998907654321'},
+    {name:'Sherzod',sn:'Toshmatov',grp:'kichik',gl:'Kichik guruh',parent:'Toshmatov Bahodir',phone:'+998901112233'},
+    {name:'Malika',sn:'Rahimova',grp:'tayyorlov',gl:'Tayyorlov guruhi',parent:'Rahimova Gulnora',phone:'+998903344556'},
+    {name:'Amir',sn:'Ergashev',grp:'katta',gl:'Katta guruh',parent:'Ergashev Timur',phone:'+998905566778'},
+    {name:'Kamola',sn:'Nazarova',grp:'orta',gl:"O'rta guruh",parent:'Nazarova Shahlo',phone:'+998904455667'},
+  ],
+  cams:{
+    kichik:[{id:'Ch1',n:"O'yin xonasi",icon:'🧸',bg:'#06101a'},{id:'Ch2',n:'Yotoqxona',icon:'🛏',bg:'#0a1a18'},{id:'Ch3',n:'Bolalar hududi',icon:'🌸',bg:'#150a20'}],
+    orta:[{id:'O1',n:'Sinf xonasi',icon:'📚',bg:'#081a10'},{id:'O2',n:'Yotoqxona',icon:'🛏',bg:'#180e00'},{id:'O3',n:'Ovqatlanish joyi',icon:'🍽',bg:'#100820'}],
+    katta:[{id:'K1',n:"O'yin xonasi",icon:'🧸',bg:'#0a1028'},{id:'K2',n:'Yotoqxona',icon:'🛏',bg:'#061a0c'},{id:'K3',n:'Ovqatlanish joyi',icon:'🍽',bg:'#1a0a08'}],
+    tayyorlov:[{id:'T1',n:'Sinf xonasi',icon:'✏️',bg:'#100618'},{id:'T2',n:'Yotoqxona',icon:'🛏',bg:'#06181a'},{id:'T3',n:'Sport zali',icon:'⚽',bg:'#0e1800'}],
+  },
+  logs:[
+    {p:'Karimov Sanjar',c:'Karimov Davron',g:'Katta',cam:'K2 — Yotoqxona',t:'16.05.2026 10:15',d:'15 daqiqa',s:'ok'},
+    {p:'Yusupova Dilnoza',c:'Yusupova Nodira',g:"O'rta",cam:"O1 — Sinf xonasi",t:'16.05.2026 09:45',d:'22 daqiqa',s:'ok'},
+    {p:'Toshmatov Bahodir',c:'Toshmatov Sherzod',g:'Kichik',cam:"Ch1 — O'yin xonasi",t:'16.05.2026 09:30',d:'8 daqiqa',s:'ok'},
+    {p:'Rahimova Gulnora',c:'Rahimova Malika',g:'Tayyorlov',cam:'T1 — Sinf xonasi',t:'16.05.2026 11:00',d:'30 daqiqa',s:'ok'},
+    {p:'Ergashev Timur',c:'Ergashev Amir',g:'Katta',cam:"K1 — O'yin xonasi",t:'16.05.2026 11:30',d:'5 daqiqa',s:'ok'},
+    {p:'Nazarova Shahlo',c:'Nazarova Kamola',g:"O'rta",cam:'O3 — Ovqatlanish',t:'16.05.2026 12:15',d:'12 daqiqa',s:'ok'},
+    {p:'Mirzayev Jasur',c:'Mirzayev Zafar',g:'Kichik',cam:'Ch2 — Yotoqxona',t:'16.05.2026 13:00',d:'18 daqiqa',s:'ok'},
+    {p:'Sobirov Alisher',c:'Sobirov Rustam',g:'Tayyorlov',cam:'T3 — Sport zali',t:'16.05.2026 14:20',d:'25 daqiqa',s:'blocked'},
+  ],
+  users:[
+    {i:'KS',p:'Karimov Sanjar',c:'Karimov Davron',g:"Katta guruh",ph:'+998901234567',on:true,col:'b2'},
+    {i:'YD',p:'Yusupova Dilnoza',c:'Yusupova Nodira',g:"O'rta guruh",ph:'+998907654321',on:true,col:'c'},
+    {i:'TB',p:'Toshmatov Bahodir',c:'Toshmatov Sherzod',g:'Kichik guruh',ph:'+998901112233',on:true,col:'p'},
+    {i:'RG',p:'Rahimova Gulnora',c:'Rahimova Malika',g:'Tayyorlov guruhi',ph:'+998903344556',on:true,col:'a'},
+    {i:'ET',p:'Ergashev Timur',c:'Ergashev Amir',g:"Katta guruh",ph:'+998905566778',on:true,col:'b2'},
+    {i:'NS',p:'Nazarova Shahlo',c:'Nazarova Kamola',g:"O'rta guruh",ph:'+998904455667',on:false,col:'c'},
+    {i:'MJ',p:'Mirzayev Jasur',c:'Mirzayev Zafar',g:'Kichik guruh',ph:'+998906677889',on:true,col:'p'},
+    {i:'SA',p:'Sobirov Alisher',c:'Sobirov Rustam',g:'Tayyorlov guruhi',ph:'+998901122334',on:false,col:'a'},
+    {i:'HI',p:'Hamidov Ilhom',c:'Hamidov Jasur',g:"O'rta guruh",ph:'+998908899001',on:true,col:'b2'},
+    {i:'QS',p:'Qodirov Sanjar',c:'Qodirov Sirojiddin',g:'Kichik guruh',ph:'+998902233445',on:true,col:'c'},
+  ],
+  att:[
+    {n:'Karimov Davron',g:"Katta guruh",in:'08:05',out:'—',s:'present'},
+    {n:'Yusupova Nodira',g:"O'rta guruh",in:'08:12',out:'—',s:'present'},
+    {n:'Toshmatov Sherzod',g:'Kichik guruh',in:'08:20',out:'14:30',s:'left'},
+    {n:'Rahimova Malika',g:'Tayyorlov guruhi',in:'08:08',out:'—',s:'present'},
+    {n:'Ergashev Amir',g:"Katta guruh",in:'—',out:'—',s:'absent'},
+    {n:'Nazarova Kamola',g:"O'rta guruh",in:'08:35',out:'—',s:'present'},
+    {n:'Mirzayev Zafar',g:'Kichik guruh',in:'08:10',out:'13:00',s:'left'},
+    {n:'Sobirov Rustam',g:'Tayyorlov guruhi',in:'—',out:'—',s:'absent'},
+    {n:'Hamidov Jasur',g:"O'rta guruh",in:'09:00',out:'—',s:'present'},
+    {n:'Qodirov Sirojiddin',g:'Kichik guruh',in:'08:45',out:'—',s:'present'},
+    {n:'Aliyeva Sarvinoz',g:"Katta guruh",in:'08:18',out:'—',s:'present'},
+    {n:'Normatova Hulkar',g:'Tayyorlov guruhi',in:'08:22',out:'—',s:'present'},
+    {n:'Tursunov Behruz',g:'Kichik guruh',in:'08:55',out:'—',s:'present'},
+    {n:'Xolmatov Ulugbek',g:"O'rta guruh",in:'—',out:'—',s:'absent'},
+  ],
+  notifs:[
+    {title:"Navro'z bayrami tadbiri",body:"Ertaga soat 10:00 da bog'chamizda Navro'z bayrami bo'ladi. Barcha ota-onalar taklif qilinadi!",to:'Barcha',type:'📢',t:'16.05 · 09:00'},
+    {title:'Katta guruh — ota-onalar majlisi',body:"17-may, juma kuni soat 18:00 da katta guruh uchun majlis bo'ladi. Qatnashish majburiy.",to:"Katta guruh",type:'📅',t:'15.05 · 15:30'},
+    {title:'Tayyorlov guruhi — ekskursiya',body:"Kelasi haftada shahar muzeyiga ekskursiya. Ruxsatnomani 18-gacha topshiring.",to:"Tayyorlov guruhi",type:'📅',t:'14.05 · 11:00'},
+    {title:"O'rta guruh — tibbiy ko'rik",body:"19-may kuni barcha o'rta guruh bolalari uchun tibbiy ko'rik o'tkaziladi. Bolalarni sog'lom holda keltiring.",to:"O'rta guruh",type:'💊',t:'13.05 · 14:20'},
+  ],
+  ipCams:[
+    {id:'K1',n:"Katta guruh — O'yin xonasi",ip:'192.168.1.101',g:'Katta guruh',proto:'RTSP',s:'online'},
+    {id:'K2',n:'Katta guruh — Yotoqxona',ip:'192.168.1.102',g:'Katta guruh',proto:'RTSP',s:'online'},
+    {id:'K3',n:'Katta guruh — Ovqatlanish',ip:'192.168.1.103',g:'Katta guruh',proto:'RTSP',s:'online'},
+    {id:'O1',n:"O'rta guruh — Sinf xonasi",ip:'192.168.1.111',g:"O'rta guruh",proto:'HLS',s:'online'},
+    {id:'O2',n:"O'rta guruh — Yotoqxona",ip:'192.168.1.112',g:"O'rta guruh",proto:'HLS',s:'offline'},
+    {id:'O3',n:"O'rta guruh — Ovqatlanish",ip:'192.168.1.113',g:"O'rta guruh",proto:'HLS',s:'online'},
+    {id:'Ch1',n:"Kichik guruh — O'yin xonasi",ip:'192.168.1.121',g:'Kichik guruh',proto:'WebRTC',s:'online'},
+    {id:'Ch2',n:'Kichik guruh — Yotoqxona',ip:'192.168.1.122',g:'Kichik guruh',proto:'WebRTC',s:'online'},
+    {id:'Ch3',n:'Kichik guruh — Bolalar hududi',ip:'192.168.1.123',g:'Kichik guruh',proto:'WebRTC',s:'online'},
+    {id:'T1',n:'Tayyorlov — Sinf xonasi',ip:'192.168.1.131',g:'Tayyorlov guruhi',proto:'RTSP',s:'online'},
+    {id:'T2',n:'Tayyorlov — Yotoqxona',ip:'192.168.1.132',g:'Tayyorlov guruhi',proto:'RTSP',s:'online'},
+    {id:'T3',n:'Tayyorlov — Sport zali',ip:'192.168.1.133',g:'Tayyorlov guruhi',proto:'RTSP',s:'online'},
+  ],
+};
+
+// =====================================================
+//   STATE
+// =====================================================
+let CU = null; // current user
+let scanRunning = false;
+let vidStream = null;
+let scanIv = null;
+let anims = {};
+let fullAnimId = null;
+let snapCanvas = null;
+let sessionSec = 0;
+let sessionIv = null;
+let delTarget = -1;
+
+// =====================================================
+//   CLOCK
+// =====================================================
+function updateClock(){
+  const now = new Date();
+  const el = document.getElementById('tbClock');
+  if(el) el.textContent = now.toLocaleTimeString('uz-UZ');
+  const lv = document.getElementById('lvTime');
+  if(lv) lv.textContent = now.toLocaleString('uz-UZ');
+}
+setInterval(updateClock, 1000); updateClock();
+
+// =====================================================
+//   SCREEN
+// =====================================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s-'+id).classList.add('on');
+}
+function goHome(){
+  stopAllCams();
+  stopFid();
+  clearInterval(sessionIv);
+  sessionSec = 0;
+  CU = null;
+  document.getElementById('upill').classList.remove('on');
+  document.getElementById('btnExit').style.display = 'none';
+  document.getElementById('tbCams').style.display = 'none';
+  showScreen('land');
+  animCount('ls1',12); animCount('ls2',4); animCount('ls3',48); animCount('ls4',43);
+}
+
+function animCount(id, target){
+  const el = document.getElementById(id);
+  if(!el) return;
+  let v=0; const step=Math.ceil(target/40);
+  const iv = setInterval(()=>{ v=Math.min(v+step,target); el.textContent=v; if(v>=target)clearInterval(iv); }, 30);
+}
+setTimeout(()=>{ animCount('ls1',12); animCount('ls2',4); animCount('ls3',48); animCount('ls4',43); }, 400);
+
+function setUser(name, initial){
+  document.getElementById('uname').textContent = name;
+  document.getElementById('uavt').textContent = initial;
+  document.getElementById('upill').classList.add('on');
+  document.getElementById('btnExit').style.display = 'block';
+}
+
+// =====================================================
+//   TOAST
+// =====================================================
+function toast(msg, type='ok', dur=3000){
+  const box = document.getElementById('toastBox');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(), 300); }, dur);
+}
+
+// =====================================================
+//   MODALS
+// =====================================================
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('on'); });
+});
+
+// =====================================================
+//   DIRECTOR LOGIN
+// =====================================================
+function gotoDirLogin(){ showScreen('dlogin'); document.getElementById('dl-pass').value=''; }
+function togglePass(){
+  const inp = document.getElementById('dl-pass');
+  inp.type = inp.type==='password' ? 'text' : 'password';
+}
+function dirLogin(){
+  const u = document.getElementById('dl-user').value.trim();
+  const p = document.getElementById('dl-pass').value;
+  const err = document.getElementById('dl-err');
+  if(u==='admin' && p==='1234'){
+    err.style.display='none';
+    setUser('Direktor', 'D');
+    document.getElementById('tbCams').style.display='flex';
+    document.getElementById('tbCamCount').textContent='11';
+    showScreen('dir');
+    buildDir();
+    toast('Xush kelibsiz, Direktor!','ok');
+  } else {
+    err.style.display='block'; err.textContent='❌ Login yoki parol noto\'g\'ri.';
+    toast('Autentifikatsiya muvaffaqiyatsiz','err');
+  }
+}
+
+// =====================================================
+//   PARENT FLOW
+// =====================================================
+function gotoParent(){ showScreen('parent'); showPS(1); }
+function showPS(n){
+  [1,2].forEach(i=>document.getElementById('ps'+i).style.display=i===n?'block':'none');
+  ['sp1','sp2','sp3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.className='spill'+(i<n-1?' done':i===n-1?' on':'');
+  });
+  if(n===2) initFid();
+}
+function checkParent(){
+  const nm = document.getElementById('f-nm').value.trim().toLowerCase();
+  const sn = document.getElementById('f-sn').value.trim().toLowerCase();
+  const gr = document.getElementById('f-gr').value;
+  const err = document.getElementById('p-err');
+  if(!nm||!sn||!gr){err.style.display='block';err.textContent="⚠️ Barcha maydonlarni to'ldiring.";return;}
+  const found = DB.children.find(c=>c.name.toLowerCase()===nm&&c.sn.toLowerCase()===sn&&c.grp===gr);
+  if(!found){err.style.display='block';err.textContent="❌ Ma'lumotlar bazada topilmadi. Qayta tekshiring.";return;}
+  err.style.display='none';
+  CU = found;
+  showPS(2);
+}
+
+// =====================================================
+//   FACE ID
+// =====================================================
+function initFid(){
+  scanRunning=false;
+  const box = document.getElementById('fidBox');
+  box.className='fid-wrap';
+  document.getElementById('fidPh').style.display='flex';
+  document.getElementById('fidVid').style.display='none';
+  document.getElementById('fidCnv').style.display='none';
+  document.getElementById('fidRing').style.display='none';
+  document.getElementById('fidProg').style.display='none';
+  document.getElementById('fidBar').style.width='0';
+  document.getElementById('matchBox').style.display='none';
+  document.getElementById('fid-ok').style.display='none';
+  document.getElementById('fidMsg').textContent='Bosing va skanerlashni boshlang';
+}
+function stopFid(){
+  if(vidStream){vidStream.getTracks().forEach(t=>t.stop());vidStream=null;}
+  if(scanIv){clearInterval(scanIv);scanIv=null;}
+}
+async function startFid(){
+  if(scanRunning) return;
+  scanRunning=true;
+  const box=document.getElementById('fidBox');
+  const vid=document.getElementById('fidVid');
+  const ph=document.getElementById('fidPh');
+  const ring=document.getElementById('fidRing');
+  const prog=document.getElementById('fidProg');
+  const bar=document.getElementById('fidBar');
+  const msg=document.getElementById('fidMsg');
+  const cnv=document.getElementById('fidCnv');
+
+  ph.style.display='none';
+  ring.style.display='block';
+  prog.style.display='block';
+  box.className='fid-wrap scan';
+  msg.textContent='Kamera ulanmoqda...';
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:240},height:{ideal:240}}});
+    vidStream = stream;
+    vid.srcObject = stream;
+    vid.style.display='block';
+    cnv.style.display='block';
+    cnv.width=200; cnv.height=200;
+    await vid.play();
+    animFidOverlay(cnv);
+    toast('Kamera ulandi','info');
+  } catch(e){
+    vid.style.display='none';
+    cnv.style.display='block';
+    cnv.width=200; cnv.height=200;
+    drawFidAnim(cnv);
+    toast('Kamera qurilmasi topilmadi — simulyatsiya','warn');
+  }
+
+  const msgs=['Kamera ulanmoqda...','Yuz qiyofasi aniqlanmoqda...','Biometrik tahlil...','Bazadagi rasm bilan solishtirilmoqda...','Tasdiqlash: mos kelish 97.3%...'];
+  const at=[0,25,45,65,85];
+  let pct=0;
+  scanIv = setInterval(()=>{
+    pct=Math.min(pct+.9,100);
+    bar.style.width=pct+'%';
+    at.forEach((v,i)=>{ if(Math.floor(pct)===v) msg.textContent=msgs[i]; });
+    if(pct>=100){ clearInterval(scanIv); fidDone(); }
+  }, 50);
+}
+function animFidOverlay(cnv){
+  const ctx=cnv.getContext('2d');
+  let t=0;
+  function draw(){
+    t++;
+    ctx.clearRect(0,0,200,200);
+    // Detection box corners
+    const c=[[20,20,1,1],[180,20,-1,1],[20,180,1,-1],[180,180,-1,-1]];
+    ctx.strokeStyle=`rgba(34,211,238,${.4+.3*Math.sin(t*.06)})`;
+    ctx.lineWidth=2;
+    c.forEach(([x,y,sx,sy])=>{
+      ctx.beginPath();ctx.moveTo(x,y+sy*20);ctx.lineTo(x,y);ctx.lineTo(x+sx*20,y);ctx.stroke();
+    });
+    // Face landmarks dots
+    const pts=[[100,75],[80,68],[120,68],[100,88],[88,102],[112,102]];
+    pts.forEach(([px,py],i)=>{
+      ctx.fillStyle=`rgba(0,232,122,${.6+.3*Math.sin(t*.08+i)})`;
+      ctx.beginPath();ctx.arc(px,py,3,0,Math.PI*2);ctx.fill();
+    });
+    // Face ellipse
+    ctx.strokeStyle='rgba(34,211,238,.3)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.ellipse(100,90,44,56,0,0,Math.PI*2);ctx.stroke();
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+function drawFidAnim(cnv){
+  const ctx=cnv.getContext('2d');
+  let t=0;
+  function draw(){
+    t++;
+    ctx.clearRect(0,0,200,200);
+    ctx.fillStyle='rgba(34,211,238,.04)';
+    ctx.beginPath();ctx.ellipse(100,90,52,65,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(34,211,238,.04)';
+    ctx.beginPath();ctx.ellipse(100,175,35,22,0,0,Math.PI*2);ctx.fill();
+    const sy=(t*1.8)%200;
+    const g=ctx.createLinearGradient(0,sy-8,0,sy+8);
+    g.addColorStop(0,'transparent');g.addColorStop(.5,'rgba(34,211,238,.25)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,sy-8,200,16);
+    const c=[[20,20,1,1],[180,20,-1,1],[20,180,1,-1],[180,180,-1,-1]];
+    ctx.strokeStyle=`rgba(34,211,238,${.5+.25*Math.sin(t*.07)})`;ctx.lineWidth=1.5;
+    c.forEach(([x,y,sx,sy2])=>{ctx.beginPath();ctx.moveTo(x,y+sy2*18);ctx.lineTo(x,y);ctx.lineTo(x+sx*18,y);ctx.stroke();});
+    [[100,90,44,56],[80,72],[120,72],[100,88],[88,100],[112,100]].forEach(([px,py,rx,ry],i)=>{
+      if(i===0){ctx.strokeStyle='rgba(34,211,238,.35)';ctx.beginPath();ctx.ellipse(px,py,rx,ry,0,0,Math.PI*2);ctx.stroke();}
+      else{ctx.fillStyle=`rgba(0,232,122,${.5+.3*Math.sin(t*.1+i)})`;ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);ctx.fill();}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+function fidDone(){
+  const box=document.getElementById('fidBox');
+  box.className='fid-wrap done';
+  document.getElementById('fidRing').style.display='none';
+  const mb=document.getElementById('matchBox');
+  const mn=document.getElementById('matchNum');
+  mb.style.display='block';
+  let s=0, tgt=97.3;
+  const iv=setInterval(()=>{ s=Math.min(s+1.5,tgt); mn.textContent=s.toFixed(1)+'%'; if(s>=tgt)clearInterval(iv); }, 25);
+  const ok=document.getElementById('fid-ok');
+  ok.style.display='block';
+  ok.textContent=`✅ Shaxs tasdiqlandi! Xush kelibsiz, ${CU.parent}!`;
+  document.getElementById('fidMsg').textContent='';
+  toast('Face ID tasdiqlandi — 97.3%','ok');
+  setTimeout(openCams, 1800);
+}
+
+// =====================================================
+//   CAMERA VIEW (PARENT)
+// =====================================================
+function openCams(){
+  stopFid();
+  const cams = DB.cams[CU.grp]||[];
+  document.getElementById('camTitle').textContent = CU.gl + ' kameralari';
+  document.getElementById('camSub').textContent = `${CU.name} ${CU.sn} · ${CU.parent}`;
+  document.getElementById('accGrp').textContent = CU.gl;
+  setUser(CU.parent, CU.parent[0]);
+  document.getElementById('tbCams').style.display='flex';
+  document.getElementById('tbCamCount').textContent=cams.length;
+  ['sp1','sp2','sp3'].forEach(id=>{ const e=document.getElementById(id); if(e) e.className='spill done'; });
+
+  const grid=document.getElementById('camGrid');
+  grid.innerHTML='';
+  stopAllCams();
+
+  cams.forEach((cam,i)=>{
+    const div=document.createElement('div');
+    div.className='cam-tile'+(i===0?' sel':'');
+    div.innerHTML=`
+      <div class="cam-scr">
+        <canvas id="c-${cam.id}" width="640" height="360"></canvas>
+        <div class="cam-top">
+          <div style="display:flex;align-items:center;gap:6px"><div class="lpill">LIVE</div></div>
+          <span class="cam-stamp" id="cst-${cam.id}"></span>
+        </div>
+        <div class="cam-bot">
+          <span class="cam-id">CAM ${cam.id} · ${cam.n}</span>
+          <span class="cam-id" id="crec-${cam.id}">● REC</span>
+        </div>
+      </div>
+      <div class="cam-ft">
+        <div class="cam-ft-l">
+          <div class="cam-name">${cam.icon} ${cam.n}</div>
+          <div class="cam-sub">Kamera ${cam.id} · ${CU.gl}</div>
+        </div>
+        <div class="cam-ft-r">
+          <div class="sonline"></div>
+          <button class="btn-icon" title="Snapshot" onclick="snapCam('${cam.id}','${cam.n}','${cam.bg}')">📸</button>
+          <button class="btn-icon" title="To'liq ekran" onclick="openFull('${cam.id}','${cam.n}','${cam.bg}')">⛶</button>
+        </div>
+      </div>`;
+    div.addEventListener('click', ()=>{ document.querySelectorAll('.cam-tile').forEach(c=>c.classList.remove('sel')); div.classList.add('sel'); });
+    grid.appendChild(div);
+    startCamAnim('c-'+cam.id, cam.bg, cam.id);
+  });
+
+  // Timestamp
+  const stIv = setInterval(()=>{
+    const now=new Date();
+    cams.forEach(cam=>{ const el=document.getElementById('cst-'+cam.id); if(el) el.textContent=now.toLocaleString('uz-UZ'); });
+  }, 1000);
+  anims['__stamps'] = stIv;
+
+  // Session timer
+  sessionSec=0;
+  clearInterval(sessionIv);
+  sessionIv=setInterval(()=>{
+    sessionSec++;
+    const m=String(Math.floor(sessionSec/60)).padStart(2,'0');
+    const s=String(sessionSec%60).padStart(2,'0');
+    const el=document.getElementById('sessionTimer');
+    if(el) el.textContent=m+':'+s;
+  }, 1000);
+
+  showScreen('cams');
+}
+
+// =====================================================
+//   CAMERA ANIMATION ENGINE
+// =====================================================
+function startCamAnim(canvasId, bg, camId){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width||640, H=canvas.height||360;
+  const figures=Array.from({length:5+Math.floor(Math.random()*3)},(_,i)=>({
+    x:60+i*(W/6),y:H*.58+Math.random()*40,
+    r:11+Math.random()*6,
+    vx:(Math.random()-.5)*.55,vy:0,phase:i*1.3,
+    hue:190+i*25,sat:45+Math.random()*20
+  }));
+  let fr=0;
+  function draw(){
+    fr++;
+    ctx.fillStyle=bg||'#0a1020'; ctx.fillRect(0,0,W,H);
+    // Perspective floor
+    ctx.fillStyle='rgba(255,255,255,.02)'; ctx.fillRect(0,H*.68,W,H*.32);
+    // Perspective lines
+    ctx.strokeStyle='rgba(255,255,255,.012)'; ctx.lineWidth=1;
+    for(let i=0;i<=10;i++){ ctx.beginPath();ctx.moveTo(W*.5,H*.3);ctx.lineTo(i*W/10,H);ctx.stroke(); }
+    for(let j=0;j<=4;j++){ const y=H*(.4+j*.15); ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+    // Furniture / objects
+    ctx.fillStyle='rgba(255,255,255,.03)';
+    ctx.fillRect(W*.05,H*.4,W*.15,H*.25);
+    ctx.fillRect(W*.7,H*.38,W*.2,H*.28);
+    // Figures
+    figures.forEach((f,i)=>{
+      f.x+=f.vx; f.phase+=.018;
+      f.y=H*.6+Math.sin(f.phase)*4;
+      if(f.x<f.r||f.x>W-f.r) f.vx*=-1;
+      // Shadow
+      ctx.fillStyle='rgba(0,0,0,.12)';
+      ctx.beginPath();ctx.ellipse(f.x,H*.71,f.r*.9,f.r*.15,0,0,Math.PI*2);ctx.fill();
+      // Body
+      ctx.fillStyle=`hsla(${f.hue},${f.sat}%,50%,.55)`;
+      ctx.beginPath();ctx.ellipse(f.x,f.y+f.r*1.5,f.r*.7,f.r*1.55,0,0,Math.PI*2);ctx.fill();
+      // Head
+      ctx.fillStyle=`hsla(${f.hue+15},${f.sat-5}%,62%,.7)`;
+      ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+    });
+    // Scanlines
+    for(let y=0;y<H;y+=3){ ctx.fillStyle='rgba(0,0,0,.025)';ctx.fillRect(0,y,W,1); }
+    // Grain (every 4th frame)
+    if(fr%4===0){
+      for(let k=0;k<180;k++){
+        const gx=Math.random()*W, gy=Math.random()*H, gs=Math.random()*1.5;
+        ctx.fillStyle=`rgba(255,255,255,${Math.random()*.04})`;
+        ctx.fillRect(gx,gy,gs,gs);
+      }
+    }
+    // Vignette
+    const vg=ctx.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,H*.75);
+    vg.addColorStop(0,'transparent'); vg.addColorStop(1,'rgba(0,0,0,.35)');
+    ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+    // Timestamp
+    ctx.fillStyle='rgba(255,255,255,.28)';
+    ctx.font=`10px 'JetBrains Mono',monospace`;
+    ctx.fillText(new Date().toLocaleString('uz-UZ'),8,H-8);
+    ctx.fillText('CAM-'+camId,W-68,H-8);
+    anims[canvasId]=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopAllCams(){
+  Object.entries(anims).forEach(([k,v])=>{ if(k==='__stamps') clearInterval(v); else cancelAnimationFrame(v); });
+  Object.keys(anims).forEach(k=>delete anims[k]);
+  if(fullAnimId){cancelAnimationFrame(fullAnimId);fullAnimId=null;}
+}
+
+// =====================================================
+//   FULLSCREEN
+// =====================================================
+let fullCamData={};
+function openFull(camId, camName, bg){
+  fullCamData={camId,camName,bg};
+  const cnv=document.getElementById('full-cnv');
+  if(fullAnimId){cancelAnimationFrame(fullAnimId);fullAnimId=null;}
+  const ctx=cnv.getContext('2d');
+  const W=960,H=540;
+  const figs=Array.from({length:6},(_,i)=>({x:100+i*(W/6),y:H*.58+Math.random()*50,r:16+Math.random()*8,vx:(Math.random()-.5)*.55,phase:i*1.1,hue:190+i*25}));
+  let fr=0;
+  function df(){
+    fr++;
+    ctx.fillStyle=bg||'#0a1020';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,.02)';ctx.fillRect(0,H*.68,W,H*.32);
+    ctx.strokeStyle='rgba(255,255,255,.01)';ctx.lineWidth=1;
+    for(let i=0;i<=10;i++){ctx.beginPath();ctx.moveTo(W*.5,H*.3);ctx.lineTo(i*W/10,H);ctx.stroke();}
+    figs.forEach(f=>{
+      f.x+=f.vx;f.phase+=.015;f.y=H*.6+Math.sin(f.phase)*5;
+      if(f.x<f.r||f.x>W-f.r)f.vx*=-1;
+      ctx.fillStyle='rgba(0,0,0,.1)';ctx.beginPath();ctx.ellipse(f.x,H*.7,f.r*.9,f.r*.13,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=`hsla(${f.hue},45%,50%,.5)`;ctx.beginPath();ctx.ellipse(f.x,f.y+f.r*1.5,f.r*.68,f.r*1.5,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=`hsla(${f.hue+15},40%,62%,.65)`;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+    });
+    for(let y=0;y<H;y+=3){ctx.fillStyle='rgba(0,0,0,.022)';ctx.fillRect(0,y,W,1);}
+    const vg=ctx.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.8);vg.addColorStop(0,'transparent');vg.addColorStop(1,'rgba(0,0,0,.4)');
+    ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,.25)';ctx.font="11px 'JetBrains Mono',monospace";
+    ctx.fillText(new Date().toLocaleString('uz-UZ'),10,H-10);
+    ctx.fillText('CAM-'+camId,W-70,H-10);
+    ctx.fillStyle='rgba(200,30,30,.85)';ctx.fillRect(W-120,12,6,6);
+    ctx.fillStyle='rgba(200,30,30,.85)';ctx.beginPath();ctx.arc(W-117,15,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.fillText('LIVE REC',W-108,18);
+    fullAnimId=requestAnimationFrame(df);
+  }
+  df();
+  document.getElementById('fullInfo').textContent=`📹 ${camName} · Jonli efir · ${new Date().toLocaleString('uz-UZ')}`;
+  document.getElementById('full-ov').classList.add('on');
+}
+function closeFull(){
+  if(fullAnimId){cancelAnimationFrame(fullAnimId);fullAnimId=null;}
+  document.getElementById('full-ov').classList.remove('on');
+}
+document.getElementById('full-ov').addEventListener('click',e=>{if(e.target===document.getElementById('full-ov'))closeFull();});
+function snapFull(){
+  const cnv=document.getElementById('full-cnv');
+  doSnap(cnv,'Full-Screen Kamera',fullCamData.camId);
+}
+
+// =====================================================
+//   SNAPSHOT
+// =====================================================
+function snapCam(camId, camName, bg){
+  const src=document.getElementById('c-'+camId)||document.getElementById('ac-'+camId);
+  if(src){ doSnap(src, camName, camId); return; }
+  toast('Snapshot tayyorlanmoqda...','info');
+}
+function snapAllCams(){
+  toast('Barcha kameralar snapshoti saqlanmoqda...','info');
+  setTimeout(()=>toast('3 ta snapshot saqlandi (demo)','ok'),1500);
+}
+function doSnap(srcCanvas, name, id){
+  const sc=document.getElementById('snap-cnv');
+  sc.width=srcCanvas.width; sc.height=srcCanvas.height;
+  sc.getContext('2d').drawImage(srcCanvas,0,0);
+  snapCanvas=sc;
+  document.getElementById('snap-info').textContent=`📹 ${name} (CAM-${id}) · ${new Date().toLocaleString('uz-UZ')}`;
+  openModal('ov-snap');
+}
+function downloadSnap(){
+  if(!snapCanvas) return;
+  const a=document.createElement('a');
+  a.download=`nurkoz-snapshot-${Date.now()}.png`;
+  a.href=snapCanvas.toDataURL('image/png');
+  a.click();
+  toast('Snapshot yuklab olindi','ok');
+}
+
+// =====================================================
+//   DIRECTOR UI BUILDER
+// =====================================================
+let dirBuilt=false;
+function buildDir(){
+  if(dirBuilt) return;
+  dirBuilt=true;
+  buildOverview();
+  buildAllCams();
+  buildLogs();
+  buildUsers();
+  buildAtt();
+  buildNotifs();
+  buildIPTable();
+  buildSysLog();
+  // Date
+  const now=new Date();
+  const el=document.getElementById('ovDate');
+  if(el) el.textContent=now.toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const ad=document.getElementById('attDate');
+  if(ad) ad.textContent=now.toLocaleDateString('uz-UZ',{day:'numeric',month:'long',year:'numeric'});
+  setTimeout(drawCharts,300);
+}
+
+function showPage(id, el){
+  document.querySelectorAll('.dpage').forEach(p=>p.classList.remove('on'));
+  document.getElementById('dp-'+id).classList.add('on');
+  document.querySelectorAll('.si').forEach(i=>i.classList.remove('on'));
+  if(el) el.classList.add('on');
+}
+
+// ---- OVERVIEW ----
+function buildOverview(){
+  // Live entries
+  const entries=[
+    {c:'#00e87a',t:"<strong>Karimov Sanjar</strong> — Karimov Davron (Katta guruh) · K2-kamera ko'rmoqda",ts:'10:15'},
+    {c:'#22d3ee',t:"<strong>Yusupova Dilnoza</strong> — Yusupova Nodira (O'rta guruh) · O1-kamera",ts:'09:45'},
+    {c:'#00e87a',t:"<strong>Rahimova Gulnora</strong> — Rahimova Malika (Tayyorlov) · T1-kamera",ts:'11:00'},
+    {c:'#22d3ee',t:"<strong>Ergashev Timur</strong> — Ergashev Amir (Katta guruh) · K1-kamera",ts:'11:30'},
+    {c:'#f59e0b',t:"<strong>Mirzayev Jasur</strong> — Mirzayev Zafar (Kichik guruh) · Ch2-kamera",ts:'13:00'},
+  ];
+  const ll=document.getElementById('llEntries');
+  if(ll) ll.innerHTML=entries.map(e=>`<div class="le"><div class="le-dot" style="background:${e.c}"></div><div class="le-txt">${e.t}</div><div class="le-time">${e.ts}</div></div>`).join('');
+
+  const evs=[
+    {t:'14:22',msg:'Sobirov Alisher ruxsati bloklandi',g:'Tayyorlov',b:'b-r',bl:'⛔ Bloklandi'},
+    {t:'13:01',msg:'Mirzayev Jasur Face ID orqali kirdi',g:'Kichik',b:'b-g',bl:'✓ Kirish'},
+    {t:'12:48',msg:"O'rta guruh O2 kamerasi oflayn",g:"O'rta",b:'b-a',bl:'⚠️ Ogoh'},
+    {t:'11:30',msg:"Ergashev Timur K1-kamerani ko'rdi (5 daqiqa)",g:'Katta',b:'b-b',bl:'👁 Ko\'rildi'},
+    {t:'09:00',msg:"Direktor Navro'z e'lonini yubordi",g:'Barcha',b:'b-c',bl:'📢 E\'lon'},
+    {t:'08:05',msg:"Karimov Davron bog'chaga keldi · SMS yuborildi",g:'Katta',b:'b-g',bl:'✓ Keldi'},
+  ];
+  const evt=document.getElementById('evTbody');
+  if(evt) evt.innerHTML=evs.map(e=>`<tr><td class="mono">${e.t}</td><td class="prim">${e.msg}</td><td><span class="badge b-gray">${e.g}</span></td><td><span class="badge ${e.b}">${e.bl}</span></td></tr>`).join('');
+
+  // Watcher counter simulation
+  setInterval(()=>{
+    const el=document.getElementById('wNow');
+    if(el) el.textContent=3+Math.floor(Math.random()*5);
+  },9000);
+}
+
+// ---- CHARTS ----
+function drawCharts(){
+  drawWeekChart();
+  drawAttChart();
+}
+function drawWeekChart(){
+  const cnv=document.getElementById('chartWeek');
+  if(!cnv) return;
+  const ctx=cnv.getContext('2d');
+  cnv.width=cnv.offsetWidth*2||600; cnv.height=240;
+  ctx.scale(2,2);
+  const W=cnv.width/2, H=cnv.height/2;
+  const days=['Du','Se','Ch','Pa','Ju'];
+  const vals=[35,41,38,43,39];
+  const max=50, pad=30, bw=(W-pad*2)/days.length*.6, gap=(W-pad*2)/days.length;
+  ctx.clearRect(0,0,W,H);
+  // Grid
+  for(let i=0;i<=4;i++){
+    const y=H-pad-(i/4)*(H-pad*1.4);
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-10,y);ctx.stroke();
+    ctx.fillStyle='rgba(122,145,184,.5)';ctx.font='9px Inter,sans-serif';ctx.textAlign='right';
+    ctx.fillText(Math.round(max*(i/4)),pad-4,y+3);
+  }
+  days.forEach((d,i)=>{
+    const x=pad+i*gap+(gap-bw)/2;
+    const h=(vals[i]/max)*(H-pad*1.4);
+    const y=H-pad-h;
+    const gr=ctx.createLinearGradient(0,y,0,H-pad);
+    gr.addColorStop(0,'rgba(37,99,235,.85)');gr.addColorStop(1,'rgba(6,182,212,.4)');
+    ctx.fillStyle=gr;
+    ctx.beginPath();ctx.roundRect(x,y,bw,h,3);ctx.fill();
+    ctx.fillStyle='rgba(221,228,240,.7)';ctx.font='9px Inter,sans-serif';ctx.textAlign='center';
+    ctx.fillText(d,x+bw/2,H-pad+12);
+    ctx.fillStyle='rgba(147,197,253,.9)';ctx.font='bold 9px Inter,sans-serif';
+    ctx.fillText(vals[i],x+bw/2,y-4);
+  });
+}
+function drawAttChart(){
+  const cnv=document.getElementById('chartAtt');
+  if(!cnv) return;
+  const ctx=cnv.getContext('2d');
+  cnv.width=cnv.offsetWidth*2||600; cnv.height=240;
+  ctx.scale(2,2);
+  const W=cnv.width/2, H=cnv.height/2;
+  const data=[{l:'Kichik',v:12,max:12},{l:"O'rta",v:11,max:12},{l:'Katta',v:10,max:12},{l:'Tayyorl.',v:8,max:12}];
+  const pad=30, bw=20, gap=(W-pad*2)/data.length;
+  data.forEach((d,i)=>{
+    const x=pad+i*gap+(gap-bw)/2;
+    const hMax=H-pad*1.5;
+    const hAbs=H-pad;
+    ctx.fillStyle='rgba(255,255,255,.04)';
+    ctx.beginPath();ctx.roundRect(x,pad,bw,hMax,3);ctx.fill();
+    const h=(d.v/d.max)*hMax;
+    const gr=ctx.createLinearGradient(0,hAbs-h,0,hAbs);
+    gr.addColorStop(0,'rgba(0,232,122,.8)');gr.addColorStop(1,'rgba(0,196,102,.3)');
+    ctx.fillStyle=gr;
+    ctx.beginPath();ctx.roundRect(x,hAbs-h,bw,h,3);ctx.fill();
+    ctx.fillStyle='rgba(221,228,240,.7)';ctx.font='8px Inter,sans-serif';ctx.textAlign='center';
+    ctx.fillText(d.l,x+bw/2,H-pad+12);
+    ctx.fillStyle='rgba(74,222,128,.9)';ctx.font='bold 9px Inter,sans-serif';
+    ctx.fillText(d.v+'/'+d.max,x+bw/2,hAbs-h-5);
+  });
+}
+
+// ---- ALL CAMS (ADMIN) ----
+function buildAllCams(){
+  const grid=document.getElementById('acamGrid');
+  if(!grid||grid.innerHTML.trim()) return;
+  const all=Object.entries(DB.cams).flatMap(([grp,cams])=>cams.map(c=>({...c,grp})));
+  all.forEach((cam,i)=>{
+    const off=cam.id==='O2';
+    const div=document.createElement('div');div.className='acam';
+    div.innerHTML=`
+      <div class="acam-scr">
+        <canvas id="ac-${cam.id}" width="320" height="240"></canvas>
+        <div class="acam-ol">
+          <span class="${off?'badge b-r':'lpill'}" style="font-size:9px">${off?'OFFLINE':'LIVE'}</span>
+          <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.4)">${cam.id}</span>
+        </div>
+        <div class="acam-ol2">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3)" id="acs-${cam.id}"></span>
+        </div>
+      </div>
+      <div class="acam-ft">
+        <div>
+          <div class="acam-nm">${cam.icon} ${cam.n}</div>
+          <div class="acam-grp">${cam.grp==='kichik'?'Kichik':cam.grp==='orta'?"O'rta":cam.grp==='katta'?'Katta':'Tayyorlov'} guruh</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="btn-icon" onclick="snapCam('${cam.id}','${cam.n}','${cam.bg}')" title="Snapshot">📸</button>
+          <div class="sw ${off?'off':''}" onclick="toggleSw(this)"></div>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+    if(!off){
+      startCamAnim('ac-'+cam.id, cam.bg, cam.id);
+    } else {
+      const cnv=document.getElementById('ac-'+cam.id);
+      if(cnv){
+        const ctx=cnv.getContext('2d');
+        ctx.fillStyle='#050609';ctx.fillRect(0,0,320,240);
+        ctx.fillStyle='rgba(255,255,255,.12)';ctx.font='12px sans-serif';ctx.textAlign='center';
+        ctx.fillText('📡 Signal topilmadi',160,120);ctx.fillText('192.168.1.112',160,140);
+      }
+    }
+  });
+  setInterval(()=>{
+    const now=new Date().toLocaleTimeString('uz-UZ');
+    all.forEach(cam=>{ const el=document.getElementById('acs-'+cam.id); if(el) el.textContent=now; });
+  },1000);
+}
+
+// ---- LOGS ----
+function buildLogs(filt='', srch=''){
+  const tbody=document.getElementById('lgBody');
+  if(!tbody) return;
+  let data=DB.logs;
+  if(filt) data=data.filter(l=>l.g===filt);
+  if(srch) data=data.filter(l=>l.p.toLowerCase().includes(srch)||l.c.toLowerCase().includes(srch));
+  tbody.innerHTML=data.map(l=>`<tr>
+    <td class="prim">${l.p}</td>
+    <td>${l.c}</td>
+    <td class="hide-m"><span class="badge b-b">${l.g}</span></td>
+    <td class="hide-m mono">${l.cam}</td>
+    <td class="mono">${l.t}</td>
+    <td style="color:var(--c);font-family:var(--mono);font-size:11px">${l.d}</td>
+    <td><span class="badge ${l.s==='ok'?'b-g':'b-r'}">${l.s==='ok'?'✓ OK':'⛔ Blok'}</span></td>
+  </tr>`).join('');
+}
+function filterLogs(v){ buildLogs(v, document.getElementById('lgSearch')?.value||''); }
+function searchLogs(v){ buildLogs(document.getElementById('lgFilt')?.value||'', v.toLowerCase()); }
+function exportLogs(){
+  const rows=['OTA-ONA,BOLA,GURUH,KAMERA,VAQT,DAVOMIYLIGI,HOLAT'];
+  DB.logs.forEach(l=>rows.push(`${l.p},${l.c},${l.g},${l.cam},${l.t},${l.d},${l.s}`));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='nurkoz-audit-log.csv';
+  a.click();
+  toast('Audit jurnali CSV formatida yuklab olindi','ok');
+}
+
+// ---- USERS ----
+function buildUsers(srch=''){
+  const wrap=document.getElementById('uList');
+  if(!wrap) return;
+  let data=DB.users;
+  if(srch) data=data.filter(u=>u.p.toLowerCase().includes(srch)||u.c.toLowerCase().includes(srch));
+  const colors={'b2':'background:rgba(37,99,235,.18);color:#93c5fd','c':'background:rgba(34,211,238,.12);color:#67e8f9','p':'background:rgba(139,92,246,.15);color:#c4b5fd','a':'background:rgba(245,158,11,.1);color:#fcd34d'};
+  wrap.innerHTML=data.map((u,i)=>`
+    <div class="urow">
+      <div class="ua" style="${colors[u.col]||colors['b2']};border-radius:50%;font-size:11px;font-weight:700;flex-shrink:0">${u.i}</div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--t)">${u.p}</div>
+        <div style="font-size:10px;color:var(--t2)">${u.c}</div>
+      </div>
+      <div class="hide-m" style="font-size:11px;color:var(--t2)">${u.g}</div>
+      <div class="hide-m mono" style="font-size:10px;color:var(--t2)">${u.ph}</div>
+      <div>
+        <span class="badge ${u.on?'b-g':'b-r'}" style="cursor:pointer" id="ust-${i}" onclick="toggleUser(${i})">${u.on?'✓ Faol':'⛔ Blok'}</span>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-sm" onclick="toast('Tahrirlash formasi (demo)','info')">✏</button>
+        <button class="btn btn-danger btn-sm" onclick="delTarget=${i};openModal('ov-del')">🗑</button>
+      </div>
+    </div>`).join('');
+  const uc=document.getElementById('uCount');
+  if(uc) uc.textContent=data.length;
+}
+function searchUsers(v){ buildUsers(v.toLowerCase()); }
+function toggleUser(i){
+  DB.users[i].on=!DB.users[i].on;
+  const el=document.getElementById('ust-'+i);
+  if(el){el.className='badge '+(DB.users[i].on?'b-g':'b-r');el.textContent=DB.users[i].on?'✓ Faol':'⛔ Blok';}
+  toast(DB.users[i].on?`${DB.users[i].p} — ruxsat berildi`:`${DB.users[i].p} — ruxsat bloklandi`, DB.users[i].on?'ok':'warn');
+}
+function saveUser(){
+  const p=document.getElementById('nu-pname').value.trim();
+  const c=document.getElementById('nu-cname').value.trim();
+  const g=document.getElementById('nu-group').value;
+  if(!p||!c||!g){toast("Barcha majburiy maydonlarni to'ldiring",'err');return;}
+  const initials=p.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  DB.users.unshift({i:initials,p,c,g,ph:document.getElementById('nu-phone').value||'—',on:true,col:'b2'});
+  closeModal('ov-adduser');
+  buildUsers();
+  toast(`${p} tizimga qo'shildi`,'ok');
+  ['nu-pname','nu-phone','nu-cname','nu-csurname','nu-year','nu-addr','nu-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('nu-group').value='';
+}
+function confirmDel(){
+  if(delTarget>=0 && delTarget<DB.users.length){
+    const name=DB.users[delTarget].p;
+    DB.users.splice(delTarget,1);
+    buildUsers();
+    toast(`${name} o'chirildi`,'warn');
+  }
+  closeModal('ov-del');
+  delTarget=-1;
+}
+
+// ---- ATTENDANCE ----
+function buildAtt(filt=''){
+  const wrap=document.getElementById('attBody');
+  if(!wrap) return;
+  let data=DB.att;
+  if(filt) data=data.filter(a=>a.g===filt);
+  const smap={'present':['b-g','✓ Bor'],'left':['b-a','↩ Ketdi'],'absent':['b-r','✗ Kelmadi']};
+  wrap.innerHTML=data.map(a=>`
+    <div class="att-row">
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--t)">${a.n}</div>
+        <div style="font-size:10px;color:var(--t2)">${a.g}</div>
+      </div>
+      <div class="hide-m"><span class="badge b-gray" style="font-size:9px">${a.g}</span></div>
+      <div class="att-time ${a.in!=='—'?'up':''}">${a.in}</div>
+      <div class="att-time ${a.out!=='—'?'dn':''}">${a.out}</div>
+      <div><span class="badge ${smap[a.s][0]}">${smap[a.s][1]}</span></div>
+    </div>`).join('');
+}
+function filterAtt(v){ buildAtt(v); }
+function exportAtt(){
+  const rows=['BOLA,GURUH,KELDI,KETDI,HOLAT'];
+  DB.att.forEach(a=>rows.push(`${a.n},${a.g},${a.in},${a.out},${a.s}`));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='nurkoz-davomat.csv';
+  a.click();
+  toast('Davomat Excel formatida yuklab olindi','ok');
+}
+function simQR(childName, time){
+  const qr=document.getElementById('qrIcon');
+  if(!qr) return;
+  qr.textContent='✅';
+  qr.style.background='rgba(0,232,122,.1)';
+  toast(`QR skanerlandi: ${childName} — ${time} da keldi. SMS yuborildi!`,'ok', 4000);
+  // Add to attendance
+  const idx=DB.att.findIndex(a=>a.n===childName);
+  if(idx>=0){ DB.att[idx].in=time; DB.att[idx].s='present'; buildAtt(); }
+  setTimeout(()=>{ qr.textContent='📷'; qr.style.background=''; },3000);
+}
+
+// ---- NOTIFICATIONS ----
+function buildNotifs(){
+  const list=document.getElementById('notifList');
+  if(!list||list.innerHTML.trim()) return;
+  list.innerHTML=DB.notifs.map(n=>`
+    <div class="notif-item">
+      <div>
+        <div class="ni-lbl">${n.type} ${n.title}</div>
+        <div class="ni-body">${n.body}</div>
+        <span class="badge b-b" style="margin-top:4px">${n.to}</span>
+      </div>
+      <div class="ni-time">${n.t}</div>
+    </div>`).join('');
+}
+function sendNotif(){
+  const title=document.getElementById('nTitle').value.trim();
+  const body=document.getElementById('nBody').value.trim();
+  const to=document.getElementById('nTo').value;
+  const type=document.getElementById('nType').value;
+  if(!title||!body){toast("Sarlavha va matnni to'ldiring",'err');return;}
+  const now=new Date();
+  const t=`${now.getDate()}.${String(now.getMonth()+1).padStart(2,'0')} · ${now.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'})}`;
+  const list=document.getElementById('notifList');
+  list.insertAdjacentHTML('afterbegin',`<div class="notif-item fresh">
+    <div><div class="ni-lbl">${type} ${title}</div><div class="ni-body">${body}</div><span class="badge b-g" style="margin-top:4px">✓ Yuborildi · ${to}</span></div>
+    <div class="ni-time">${t}</div>
+  </div>`);
+  document.getElementById('nTitle').value='';
+  document.getElementById('nBody').value='';
+  toast(`E'lon ${to} ga yuborildi`,'ok');
+}
+function sendSMS(){
+  const title=document.getElementById('nTitle').value.trim();
+  if(!title){toast("Avval sarlavha kiriting",'warn');return;}
+  toast("SMS barcha raqamlarga jo'natildi (demo)",'info',4000);
+}
+
+// ---- IP TABLE ----
+function buildIPTable(){
+  const tbody=document.getElementById('ipTbody');
+  if(!tbody||tbody.innerHTML.trim()) return;
+  tbody.innerHTML=DB.ipCams.map(c=>`<tr>
+    <td class="mono" style="color:var(--c)">${c.id}</td>
+    <td class="prim">${c.n}</td>
+    <td class="mono">${c.ip}</td>
+    <td style="font-size:11px;color:var(--t2)">${c.g}</td>
+    <td><span class="badge b-gray">${c.proto}</span></td>
+    <td><span class="badge ${c.s==='online'?'b-g':'b-r'}">${c.s==='online'?'● Online':'○ Offline'}</span></td>
+    <td style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-sm" onclick="pingCam(this,'${c.ip}')">Ping</button>
+      <button class="btn btn-ghost btn-sm" onclick="toast('Kamera sozlamalari (demo)','info')">✏</button>
+    </td>
+  </tr>`).join('');
+}
+function pingCam(btn, ip){
+  btn.textContent='...';btn.disabled=true;
+  setTimeout(()=>{
+    btn.textContent='✓ OK';btn.style.color='var(--g)';
+    setTimeout(()=>{btn.textContent='Ping';btn.disabled=false;btn.style.color='';},2000);
+    toast(`${ip} — javob vaqti: ${15+Math.floor(Math.random()*20)}ms`,'ok');
+  },800+Math.random()*500);
+}
+
+// ---- ADD CAMERA ----
+function saveCam(){
+  const id=document.getElementById('nc-id').value.trim();
+  const ip=document.getElementById('nc-ip').value.trim();
+  const name=document.getElementById('nc-name').value.trim();
+  if(!id||!ip||!name){toast("Barcha maydonlarni to'ldiring",'err');return;}
+  DB.ipCams.push({id,n:name,ip,g:document.getElementById('nc-group').value,proto:document.getElementById('nc-proto').value,s:'online'});
+  closeModal('ov-addcam');
+  document.getElementById('ipTbody').innerHTML='';
+  buildIPTable();
+  toast(`Kamera ${id} qo'shildi`,'ok');
+}
+
+// ---- SYSTEM LOG ----
+function buildSysLog(){
+  const el=document.getElementById('sysLog');
+  if(!el) return;
+  const logs=[
+    {type:'ok',msg:'[BOOT] NurKo\'z tizimi ishga tushdi'},
+    {type:'ok',msg:'[DB] PostgreSQL ulanish muvaffaqiyatli'},
+    {type:'ok',msg:'[STREAM] HLS media server faol: port 8080'},
+    {type:'ok',msg:'[CAM] 11/12 kamera online (K1..K3, O1, O3, Ch1..Ch3, T1..T3)'},
+    {type:'warn',msg:'[CAM] O2 (192.168.1.112) — signal yo\'q (timeout 30s)'},
+    {type:'ok',msg:'[AUTH] Face ID moduli yuklandi — threshold: 95%'},
+    {type:'ok',msg:'[SSL] HTTPS sertifikat faol, amal qilish muddati: 2027-03-15'},
+    {type:'info',msg:'[LOG] Bugun 43 ta autentifikatsiya, 8 ta sessiya'},
+    {type:'warn',msg:'[NET] Tarmoq kechikishi oshdi: 245ms (norma: <100ms)'},
+    {type:'ok',msg:'[BACKUP] Zaxira nusxa yaratildi: 2026-05-16 03:00'},
+  ];
+  el.innerHTML=logs.map(l=>`<div class="sl-line"><span class="sl-t">[${new Date().toLocaleTimeString('uz-UZ')}]</span> <span class="sl-${l.type}">${l.msg}</span></div>`).join('');
+}
+
+// ---- REPORTS ----
+function genReport(type){
+  toast(`Hisobot tayyorlanmoqda: ${type}...`,'info');
+  setTimeout(()=>toast(`${type} hisoboti tayyor — yuklab olish boshlandi`,'ok'),1500);
+}
+
+// ---- TOGGLES ----
+function toggleSw(el){ el.classList.toggle('off'); }
+
+// =====================================================
+//   RESPONSIVE MOBILE MENU
+// =====================================================
+document.querySelector('.hamburger')?.addEventListener('click', ()=>{
+  const tb=document.querySelector('.tb-center');
+  if(tb){ tb.style.display=tb.style.display==='flex'?'none':'flex'; }
+});
+
+// =====================================================
+//   KEYBOARD SHORTCUTS
+// =====================================================
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ closeFull(); document.querySelectorAll('.overlay.on').forEach(o=>o.classList.remove('on')); }
+});
+</script>
+</body>
+</html>

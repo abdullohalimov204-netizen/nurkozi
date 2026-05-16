@@ -1,0 +1,41 @@
+<form method="POST" action="/login">
+
+<input name="parent" placeholder="Ota ismi">
+<input name="child" placeholder="Bola ismi">
+
+<button type="submit">Kirish</button>
+
+</form>
+
+<h1>Ota-ona Dashboard</h1>
+
+<p>Salom {{user}}</p>
+
+<button onclick="loadStats()">Bog‘cha haqida info</button>
+
+<div id="out"></div>
+
+<script>
+async function loadStats(){
+  const res = await fetch("/stats");
+  const data = await res.json();
+
+  document.getElementById("out").innerHTML =
+  `
+    👶 Bolalar: ${data.total_children}<br>
+    👩‍🏫 Tarbiyachilar: ${data.teachers}<br>
+    📍 Joylashuv: ${data.location}
+  `;
+}
+</script>
+<h1>DIRECTOR PANEL</h1>
+
+<h3>Users</h3>
+{% for u in users %}
+<p>{{u}}</p>
+{% endfor %}
+
+<h3>Logs</h3>
+{% for l in logs %}
+<p>{{l}}</p>
+{% endfor %}
